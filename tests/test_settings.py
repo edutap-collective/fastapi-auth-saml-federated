@@ -63,7 +63,11 @@ def test_encryption_files_override():
     s = SamlSettings(
         **cast(
             dict[str, Any],
-            {**_BASE, "encryption_key_file": "/tmp/enc.key", "encryption_cert_file": "/tmp/enc.crt"},
+            {
+                **_BASE,
+                "encryption_key_file": "/tmp/enc.key",
+                "encryption_cert_file": "/tmp/enc.crt",
+            },
         )
     )
     assert s.enc_key_file == "/tmp/enc.key"
