@@ -10,6 +10,7 @@ from collections.abc import Awaitable, Callable
 from fastapi import HTTPException, Request, status
 
 from fastapi_auth.saml.engine.client import SamlEngine
+from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.router import build_router
 from fastapi_auth.saml.session.cookie import CookieBackend
@@ -48,6 +49,12 @@ class SamlSP:
             return identity
 
         return _dep
+
+    def identifier(self, identity: FederatedIdentity) -> str | None:
+        """Return this SP's chosen stable identifier for the identity."""
+        return select_identifier(
+            identity, self.settings.identifier, self.settings.identifier_fallback
+        )
 
 
 __all__ = ["SamlSP"]

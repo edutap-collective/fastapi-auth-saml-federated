@@ -5,11 +5,14 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING, Annotated
 
-from fastapi import APIRouter, Form, Response
+from fastapi import APIRouter, Form, HTTPException, Response
 from fastapi.responses import RedirectResponse
 
+from fastapi_auth.saml.engine.enforcement import check_required_attributes
+from fastapi_auth.saml.engine.errors import AttributeReleaseError, SamlResponseError
 from fastapi_auth.saml.redirect import is_safe_redirect
 
 if TYPE_CHECKING:
@@ -26,7 +29,7 @@ def build_router(sp: SamlSP) -> APIRouter:
     async def login(next: str = "/") -> RedirectResponse:
         safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
         request_id, location = await sp.engine.create_authn_request(relay_state=safe_next)
-        await sp.store.add_outstanding(request_id, safe_next)
+        await sp.store.add_outstanding(request_id, safe_next, time.monotonic())
         return RedirectResponse(location, status_code=303)
 
     @router.post("/acs")
@@ -34,10 +37,17 @@ def build_router(sp: SamlSP) -> APIRouter:
         SAMLResponse: Annotated[str, Form()],
         RelayState: Annotated[str, Form()] = "/",
     ) -> RedirectResponse:
+        await sp.store.purge_expired(sp.settings.session_ttl, time.monotonic())
         outstanding = await sp.store.outstanding()
-        identity = await sp.engine.parse_response(SAMLResponse, outstanding)
-        for request_id in outstanding:
-            await sp.store.pop_outstanding(request_id)
+        try:
+            identity, in_response_to = await sp.engine.parse_response(SAMLResponse, outstanding)
+        except SamlResponseError as err:
+            raise HTTPException(status_code=400, detail="Invalid SAML response") from err
+        try:
+            check_required_attributes(identity, sp.settings.required_attributes)
+        except AttributeReleaseError as err:
+            raise HTTPException(status_code=403, detail=str(err)) from err
+        await sp.store.pop_outstanding(in_response_to)
         target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)
         response = RedirectResponse(target, status_code=303)
         await sp.backend.establish(identity, response)

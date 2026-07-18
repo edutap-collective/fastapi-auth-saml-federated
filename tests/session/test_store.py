@@ -27,9 +27,17 @@ async def test_delete_session():
 
 async def test_outstanding_roundtrip():
     store = MemoryStore()
-    await store.add_outstanding("req-1", "/app")
-    await store.add_outstanding("req-2", "/other")
+    await store.add_outstanding("req-1", "/app", 0.0)
+    await store.add_outstanding("req-2", "/other", 0.0)
     assert await store.outstanding() == {"req-1": "/app", "req-2": "/other"}
     assert await store.pop_outstanding("req-1") == "/app"
     assert await store.outstanding() == {"req-2": "/other"}
     assert await store.pop_outstanding("gone") is None
+
+
+async def test_purge_expired_drops_old_entries_and_keeps_fresh_ones():
+    store = MemoryStore()
+    await store.add_outstanding("old", "/old", 0.0)
+    await store.add_outstanding("fresh", "/fresh", 100.0)
+    await store.purge_expired(ttl_seconds=60, now=100.0)
+    assert await store.outstanding() == {"fresh": "/fresh"}

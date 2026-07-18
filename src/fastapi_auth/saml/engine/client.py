@@ -17,6 +17,7 @@ from saml2.config import SPConfig
 from saml2.metadata import create_metadata_string
 
 from fastapi_auth.saml.engine.config import build_sp_config
+from fastapi_auth.saml.engine.errors import SamlResponseError
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.settings import SamlSettings
@@ -91,18 +92,23 @@ class SamlEngine:
 
     async def parse_response(
         self, saml_response: str, outstanding: dict[str, str]
-    ) -> FederatedIdentity:
-        """Validate a base64 SAML response and map it onto a FederatedIdentity."""
+    ) -> tuple[FederatedIdentity, str]:
+        """Validate a base64 SAML response; return (identity, in_response_to)."""
         return await anyio.to_thread.run_sync(self._parse, saml_response, outstanding)
 
-    def _parse(self, saml_response: str, outstanding: dict[str, str]) -> FederatedIdentity:
-        resp = self._client.parse_authn_request_response(
-            saml_response, BINDING_HTTP_POST, outstanding=outstanding
-        )
+    def _parse(
+        self, saml_response: str, outstanding: dict[str, str]
+    ) -> tuple[FederatedIdentity, str]:
+        try:
+            resp = self._client.parse_authn_request_response(
+                saml_response, BINDING_HTTP_POST, outstanding=outstanding
+            )
+        except Exception as err:  # pysaml2 raises many types on bad/forged input
+            raise SamlResponseError(str(err)) from err
         if resp is None:
-            msg = "SAML response could not be parsed"
-            raise ValueError(msg)
-        return to_identity(resp)
+            raise SamlResponseError("SAML response could not be parsed")
+        in_response_to = resp.in_response_to or ""  # pysaml2 untyped
+        return to_identity(resp), in_response_to
 
     def sp_metadata(self) -> str:
         """Return this SP's metadata XML."""

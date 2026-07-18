@@ -31,5 +31,7 @@ async def test_encrypted_assertion_is_decrypted(certs, idp_metadata_file, make_i
         ava={"eduPersonPrincipalName": ["u@test.de"], "mail": ["u@test.de"]},
         encrypt_cert=Path(certs["sp_crt"]).read_text(),
     )
-    identity = await engine.parse_response(saml_response, outstanding={reqid: "/app"})
+    identity, _in_response_to = await engine.parse_response(
+        saml_response, outstanding={reqid: "/app"}
+    )
     assert identity.eppn == "u@test.de"

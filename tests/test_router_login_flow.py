@@ -106,7 +106,7 @@ def test_login_next_open_redirect_is_sanitized(certs, idp_metadata_file, make_id
     reqids = list(sp.store._outstanding)
     assert len(reqids) == 1
     reqid = reqids[0]
-    assert sp.store._outstanding[reqid] == "/"
+    assert sp.store._outstanding[reqid][0] == "/"
 
     # 2. IdP mints a signed response for that request
     idp = make_idp(sp.engine.sp_metadata())
