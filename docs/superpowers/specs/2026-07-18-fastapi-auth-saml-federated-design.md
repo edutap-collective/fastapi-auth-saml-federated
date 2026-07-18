@@ -49,7 +49,7 @@ Namespace teilen können.
 | SAML-Engine       | Wrapper um **`pysaml2`**, synchrone Calls via `anyio.to_thread.run_sync` |
 | Krypto-Backend    | ausschließlich **`xmlsec1`** (libxmlsec1) — volle Funktion inkl. Assertion-Decryption |
 | Session-Modell    | **Pluggable** `SessionBackend`: Cookie (Default) + JWT (Opt-in)          |
-| Metadaten/Trust   | **Konfigurierbar**: MDQ (Default) *oder* Aggregat-Datei                   |
+| Metadaten/Trust   | **Konfigurierbar**: MDQ (Default) · Aggregat-Datei · einzelne IdP-Metadaten (bilateral) |
 | Discovery         | **Extern (DS-Protocol, Default)** + Embedded-Picker + feste entityID     |
 | Identitätsmodell  | **Typisiert** (`FederatedIdentity`) + `attributes`-Escape-Hatch          |
 | Teststrategie     | **Gestuft**: Unit (respx) / Integration (compose) / E2E (DFN-AAI-Test)   |
@@ -265,8 +265,9 @@ Skizze der Kernfelder (Details im Implementierungsplan):
 
 ```text
 SP:        entity_id, base_url, acs_path, key_file, cert_file, extra_certs[]
-Metadaten: source = 'mdq' | 'aggregate'
+Metadaten: source = 'mdq' | 'aggregate' | 'direct'   # direct = einzelner IdP (bilateral)
            mdq_url, aggregate_url, trust_anchor_cert, refresh_interval
+           idp_metadata_url, idp_metadata_file        # für source='direct'
 Discovery: mode = 'external' | 'embedded' | 'passthrough'
            ds_url, fixed_idp_entity_id
 Session:   backend = 'cookie' | 'jwt'
@@ -287,7 +288,9 @@ Security:  clock_skew, want_assertions_signed=True, allowed_redirect_hosts[]
 - **Integration** (`compose.yml`, `make test-integration`): `sp` (unser App) +
   `idp` (**SimpleSAMLphp** mit eduPerson/SCHAC-Attributen) + statischer
   **MDQ/Metadaten-Service** + optional **DS**. Flow headless über `httpx`
-  (Redirects + Formular-Parsing); embedded WAYF ggf. Playwright.
+  (Redirects + Formular-Parsing); embedded WAYF ggf. Playwright. Deckt zugleich
+  den **bilateralen Einzel-IdP-Pfad** (`source='direct'` + `passthrough`) ab,
+  daneben ein MDQ-Szenario für den föderierten Pfad.
 - **E2E** (dokumentiert, nightly/manuell): How-to zur SP-Registrierung in der
   **DFN-AAI-Testföderation**, Test gegen deren Test-IdP + zentralen DS + MDQ.
   Nicht im PR-CI (nicht deterministisch, netzabhängig, Zertifikate nötig).
