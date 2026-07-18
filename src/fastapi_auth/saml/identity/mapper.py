@@ -25,7 +25,7 @@ def map_attributes(
     assertion_id: str | None = None,
 ) -> FederatedIdentity:
     """Build a FederatedIdentity from released attributes and assertion metadata."""
-    fields: dict[str, object] = {}
+    fields: dict[str, str | list[str]] = {}
     attributes: dict[str, list[str]] = {}
 
     for key, values in raw.items():
@@ -46,5 +46,5 @@ def map_attributes(
         authn_context_class=authn_context_class,
         assertion_id=assertion_id,
         attributes=attributes,
-        **fields,
+        **fields,  # ty: ignore[invalid-argument-type]  # dynamic kwargs: keys are validated registry fields; types are str|list[str]
     )

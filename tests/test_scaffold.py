@@ -7,7 +7,7 @@ def test_package_imports_via_namespace():
     assert saml.__version__ == "0.1.0.dev0"
 
 
-def test_namespace_has_no_init_module(tmp_path):
+def test_namespace_has_no_init_module():
     import fastapi_auth
 
     # PEP 420 namespace packages expose no single __file__.
