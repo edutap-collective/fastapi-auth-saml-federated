@@ -107,5 +107,6 @@ def test_jwt_backend_requires_strong_secret():
 
 
 def test_jwt_backend_accepts_strong_secret():
-    s = SamlSettings(**cast(dict[str, Any], {**_BASE, "backend": "jwt", "session_secret": "s" * 32}))
+    data = cast(dict[str, Any], {**_BASE, "backend": "jwt", "session_secret": "s" * 32})
+    s = SamlSettings(**data)
     assert s.backend == "jwt"
