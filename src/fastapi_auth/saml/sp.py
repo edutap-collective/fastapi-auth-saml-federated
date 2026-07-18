@@ -10,11 +10,10 @@ from collections.abc import Awaitable, Callable
 from fastapi import HTTPException, Request, status
 
 from fastapi_auth.saml.engine.client import SamlEngine
+from fastapi_auth.saml.factory import make_backend, make_store
 from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.router import build_router
-from fastapi_auth.saml.session.cookie import CookieBackend
-from fastapi_auth.saml.session.store import MemoryStore
 from fastapi_auth.saml.settings import SamlSettings
 
 
@@ -25,8 +24,8 @@ class SamlSP:
         """Build the engine, store, session backend and router from settings."""
         self.settings = settings
         self.engine = SamlEngine(settings)
-        self.store = MemoryStore()
-        self.backend = CookieBackend(settings, self.store)
+        self.store = make_store(settings)
+        self.backend = make_backend(settings, self.store)
         self.router = build_router(self)
 
     def optional_user(self) -> Callable[[Request], Awaitable[FederatedIdentity | None]]:

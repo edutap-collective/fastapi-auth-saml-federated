@@ -11,7 +11,7 @@ from fastapi import Request, Response
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from fastapi_auth.saml.identity.model import FederatedIdentity
-from fastapi_auth.saml.session.store import MemoryStore
+from fastapi_auth.saml.session.store import Store
 from fastapi_auth.saml.settings import SamlSettings
 
 _SALT = "fastapi-auth-saml-session"
@@ -20,7 +20,7 @@ _SALT = "fastapi-auth-saml-session"
 class CookieBackend:
     """Server-side session addressed by a signed session id in a cookie."""
 
-    def __init__(self, settings: SamlSettings, store: MemoryStore) -> None:
+    def __init__(self, settings: SamlSettings, store: Store) -> None:
         """Initialize the cookie-based session backend.
 
         Args:
