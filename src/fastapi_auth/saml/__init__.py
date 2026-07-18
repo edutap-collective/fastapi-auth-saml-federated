@@ -11,9 +11,13 @@ from __future__ import annotations
 from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
+from fastapi_auth.saml.settings import SamlSettings
+from fastapi_auth.saml.sp import SamlSP
 
 __all__ = [
     "FederatedIdentity",
+    "SamlSP",
+    "SamlSettings",
     "__version__",
     "map_attributes",
     "select_identifier",
