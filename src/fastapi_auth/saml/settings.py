@@ -10,7 +10,7 @@ from __future__ import annotations
 import shutil
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,6 +46,17 @@ class SamlSettings(BaseSettings):
     cookie_secure: bool = True
     # In-flight AuthnRequest lifetime (seconds); short-lived, unrelated to session_ttl.
     outstanding_ttl: int = 300
+
+    # --- session backend / store selection ---
+    backend: Literal["cookie", "jwt"] = "cookie"
+    store: Literal["memory", "redis", "postgres"] = "memory"
+    redis_url: str = "redis://localhost:6379/0"
+    db_url: str = "sqlite+aiosqlite:///:memory:"
+
+    # --- JWT backend (opt-in) ---
+    jwt_alg: str = "HS256"
+    jwt_ttl: int = 3600
+    jwt_secret: str | None = None
 
     # --- crypto / security ---
     xmlsec_binary: str = Field(default_factory=_default_xmlsec)
@@ -87,3 +98,16 @@ class SamlSettings(BaseSettings):
     def enc_cert_file(self) -> str:
         """Certificate advertised for assertion encryption (defaults to signing cert)."""
         return self.encryption_cert_file or self.cert_file
+
+    @property
+    def jwt_signing_secret(self) -> str:
+        """Secret/key used to sign app JWTs (defaults to the session secret)."""
+        return self.jwt_secret or self.session_secret
+
+    @model_validator(mode="after")
+    def _check_jwt_secret_strength(self) -> SamlSettings:
+        """Validate that JWT backend has a strong enough secret."""
+        if self.backend == "jwt" and len(self.jwt_signing_secret) < 32:
+            msg = "JWT backend requires jwt_secret/session_secret of at least 32 bytes"
+            raise ValueError(msg)
+        return self

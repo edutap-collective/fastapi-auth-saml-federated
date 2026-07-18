@@ -87,3 +87,25 @@ def test_profile_lists_from_values():
     )
     assert s.required_attributes == ["eduPersonPrincipalName", "mail"]
     assert s.entity_categories == ["code-of-conduct"]
+
+
+def test_backend_store_defaults():
+    s = SamlSettings(**_BASE)
+    assert s.backend == "cookie"
+    assert s.store == "memory"
+    assert s.jwt_alg == "HS256"
+
+
+def test_jwt_signing_secret_defaults_to_session_secret():
+    s = SamlSettings(**cast(dict[str, Any], {**_BASE, "session_secret": "x" * 40}))
+    assert s.jwt_signing_secret == "x" * 40
+
+
+def test_jwt_backend_requires_strong_secret():
+    with pytest.raises(ValidationError, match="32"):
+        SamlSettings(**cast(dict[str, Any], {**_BASE, "backend": "jwt", "session_secret": "short"}))
+
+
+def test_jwt_backend_accepts_strong_secret():
+    s = SamlSettings(**cast(dict[str, Any], {**_BASE, "backend": "jwt", "session_secret": "s" * 32}))
+    assert s.backend == "jwt"
