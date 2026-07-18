@@ -1,6 +1,7 @@
 """Shared test fixtures: test certs and an in-memory pysaml2 IdP."""
 
 import base64
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -16,11 +17,17 @@ IDP_EID = "urn:test:idp"
 ACS = "https://sp.example/saml/acs"
 SSO = "https://idp.example/sso"
 
+# Resolved once from PATH so tests don't depend on a hardcoded (e.g. Homebrew-only)
+# install location; tests that need them are skipped if not found.
+_OPENSSL_BIN = shutil.which("openssl")
+_XMLSEC1_BIN = shutil.which("xmlsec1")
+
 
 def _make_cert(path_key: Path, path_crt: Path, cn: str) -> None:
+    assert _OPENSSL_BIN is not None  # narrows for ty; certs() fixture already skipped otherwise
     subprocess.run(  # noqa: S603
         [
-            "/opt/homebrew/bin/openssl",
+            _OPENSSL_BIN,
             "req",
             "-x509",
             "-newkey",
@@ -42,6 +49,8 @@ def _make_cert(path_key: Path, path_crt: Path, cn: str) -> None:
 
 @pytest.fixture
 def certs(tmp_path):
+    if _OPENSSL_BIN is None:
+        pytest.skip("openssl binary not found on PATH; required to mint test certificates")
     d = tmp_path / "certs"
     d.mkdir()
     idp_key, idp_crt = d / "idp.key", d / "idp.crt"
@@ -77,11 +86,13 @@ def idp_metadata_file(tmp_path, certs):
 @pytest.fixture
 def make_idp(certs):
     """Return a factory that builds an in-memory IdP Server bound to given SP metadata."""
+    if _XMLSEC1_BIN is None:
+        pytest.skip("xmlsec1 binary not found on PATH; required for pysaml2 signing")
 
     def _factory(sp_metadata_xml: str) -> Server:
         idp_cfg = {
             "entityid": IDP_EID,
-            "xmlsec_binary": "/opt/homebrew/bin/xmlsec1",
+            "xmlsec_binary": _XMLSEC1_BIN,
             "service": {
                 "idp": {"endpoints": {"single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)]}}
             },
@@ -95,9 +106,19 @@ def make_idp(certs):
 
 
 def mint_response(
-    idp: Server, request_id: str, ava: dict[str, list[str]], name_id_text: str = "u123-persistent"
+    idp: Server,
+    request_id: str,
+    ava: dict[str, list[str]],
+    name_id_text: str = "u123-persistent",
+    *,
+    sign_response: bool = True,
+    sign_assertion: bool = True,
 ) -> str:
-    """Mint a signed base64 SAML response as an IdP would POST to the ACS."""
+    """Mint a base64 SAML response as an IdP would POST to the ACS.
+
+    ``sign_response``/``sign_assertion`` default to ``True`` (a properly signed
+    response); pass ``False`` to mint an unsigned one for negative tests.
+    """
     name_id = NameID(format=NAMEID_FORMAT_PERSISTENT, text=name_id_text)
     xml = idp.create_authn_response(
         identity=ava,
@@ -105,11 +126,15 @@ def mint_response(
         destination=ACS,
         sp_entity_id=SP_EID,
         name_id=name_id,
-        sign_response=True,
-        sign_assertion=True,
+        sign_response=sign_response,
+        sign_assertion=sign_assertion,
         authn={
             "class_ref": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
             "authn_auth": IDP_EID,
         },
     )
-    return base64.b64encode(xml.encode()).decode()
+    # pysaml2 only returns a plain string when a signing step ran (it hands back
+    # the signed_instance_factory output); an entirely unsigned response comes
+    # back as the samlp.Response object itself, so normalize before encoding.
+    xml_str = xml if isinstance(xml, str) else str(xml)
+    return base64.b64encode(xml_str.encode()).decode()

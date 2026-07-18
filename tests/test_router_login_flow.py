@@ -1,6 +1,6 @@
 """End-to-end login flow through the FastAPI router with an in-memory IdP."""
 
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
@@ -59,7 +59,7 @@ def test_full_login_flow(certs, idp_metadata_file, make_idp):
     location = login.headers["location"]
     assert "SAMLRequest" in urlparse(location).query
     # the outstanding request id is what pysaml2 generated
-    reqids = list(sp.store._outstanding)  # noqa: SLF001 - test introspection
+    reqids = list(sp.store._outstanding)
     assert len(reqids) == 1
     reqid = reqids[0]
 
@@ -89,3 +89,65 @@ def test_full_login_flow(certs, idp_metadata_file, make_idp):
     assert me.status_code == 200
     assert me.json()["eppn"] == "u123@test.de"
     assert me.json()["affiliation"] == ["staff@test.de"]
+
+
+def test_login_next_open_redirect_is_sanitized(certs, idp_metadata_file, make_idp):
+    """A protocol-relative `next` ("//evil.com") must never reach the IdP or the ACS redirect."""
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+
+    # 1. /login with a malicious next -> the RelayState sent to the IdP is sanitized
+    login = client.get("/saml/login", params={"next": "//evil.com"}, follow_redirects=False)
+    assert login.status_code == 303
+    location = login.headers["location"]
+    query = parse_qs(urlparse(location).query)
+    assert query["RelayState"] == ["/"]
+
+    reqids = list(sp.store._outstanding)
+    assert len(reqids) == 1
+    reqid = reqids[0]
+    assert sp.store._outstanding[reqid] == "/"
+
+    # 2. IdP mints a signed response for that request
+    idp = make_idp(sp.engine.sp_metadata())
+    saml_response = mint_response(
+        idp,
+        reqid,
+        ava={"eduPersonPrincipalName": ["u123@test.de"]},
+    )
+
+    # 3. POST to ACS (echoing back the already-sanitized RelayState) -> redirect stays local
+    acs = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response, "RelayState": query["RelayState"][0]},
+        follow_redirects=False,
+    )
+    assert acs.status_code == 303
+    assert acs.headers["location"] == "/"
+
+
+def test_acs_relay_state_open_redirect_is_sanitized(certs, idp_metadata_file, make_idp):
+    """A validly-minted SAMLResponse with an absolute-URL RelayState must redirect locally."""
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+
+    login = client.get("/saml/login", params={"next": "/app"}, follow_redirects=False)
+    assert login.status_code == 303
+    reqids = list(sp.store._outstanding)
+    assert len(reqids) == 1
+    reqid = reqids[0]
+
+    idp = make_idp(sp.engine.sp_metadata())
+    saml_response = mint_response(
+        idp,
+        reqid,
+        ava={"eduPersonPrincipalName": ["u123@test.de"]},
+    )
+
+    acs = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response, "RelayState": "https://evil.com"},
+        follow_redirects=False,
+    )
+    assert acs.status_code == 303
+    assert acs.headers["location"] == "/"

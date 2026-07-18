@@ -18,12 +18,13 @@ def load_idp_metadata(settings: SamlSettings) -> str:
     """Return the IdP metadata XML from the configured direct source.
 
     Exactly one of ``idp_metadata_file`` / ``idp_metadata_url`` must be set.
-    The HTTP fetch is synchronous; callers run it in a worker thread.
+    The HTTP fetch is synchronous; it runs at ``SamlEngine.__init__`` time
+    (application startup), not on the async request path.
     """
     if settings.idp_metadata_file:
         return Path(settings.idp_metadata_file).read_text(encoding="utf-8")
     if settings.idp_metadata_url:
-        resp = httpx.get(settings.idp_metadata_url, timeout=10.0)
+        resp = httpx.get(settings.idp_metadata_url, timeout=httpx.Timeout(10.0, connect=5.0))
         resp.raise_for_status()
         return resp.text
     msg = "No IdP metadata source configured (set idp_metadata_file or idp_metadata_url)"

@@ -16,26 +16,40 @@ if TYPE_CHECKING:
 _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
 
 
+def _safe_local_path(value: str) -> str:
+    """Return value only if it is a safe same-origin local path, else '/'.
+
+    Blocks open-redirect vectors such as protocol-relative URLs (``//evil.com``)
+    and absolute URLs (``https://evil.com``). Cross-host allowlisting is
+    deferred to Plan 3 — this is only the local-path guard.
+    """
+    if value.startswith("/") and not value.startswith("//"):
+        return value
+    return "/"
+
+
 def build_router(sp: SamlSP) -> APIRouter:
     """Build the /login, /acs and /metadata routes bound to this SamlSP."""
     router = APIRouter()
 
     @router.get("/login")
-    async def login(next: str = "/") -> RedirectResponse:  # noqa: A002 - matches query param name
-        request_id, location = await sp.engine.create_authn_request(relay_state=next)
-        await sp.store.add_outstanding(request_id, next)
+    async def login(next: str = "/") -> RedirectResponse:
+        safe_next = _safe_local_path(next)
+        request_id, location = await sp.engine.create_authn_request(relay_state=safe_next)
+        await sp.store.add_outstanding(request_id, safe_next)
         return RedirectResponse(location, status_code=303)
 
     @router.post("/acs")
     async def acs(
-        SAMLResponse: Annotated[str, Form()],  # noqa: N803 - SAML wire name
-        RelayState: Annotated[str, Form()] = "/",  # noqa: N803 - SAML wire name
+        SAMLResponse: Annotated[str, Form()],
+        RelayState: Annotated[str, Form()] = "/",
     ) -> RedirectResponse:
         outstanding = await sp.store.outstanding()
         identity = await sp.engine.parse_response(SAMLResponse, outstanding)
         for request_id in outstanding:
             await sp.store.pop_outstanding(request_id)
-        response = RedirectResponse(RelayState or "/", status_code=303)
+        target = _safe_local_path(RelayState or "/")
+        response = RedirectResponse(target, status_code=303)
         await sp.backend.establish(identity, response)
         return response
 

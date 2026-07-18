@@ -1,5 +1,7 @@
 """End-to-end engine test: SP AuthnRequest -> in-memory IdP -> SP validates."""
 
+import pytest
+from saml2.sigver import SignatureError
 from tests.conftest import IDP_EID, SSO, mint_response
 
 from fastapi_auth.saml.engine.client import SamlEngine
@@ -47,3 +49,22 @@ async def test_roundtrip_yields_federated_identity(certs, idp_metadata_file, mak
     assert identity.scoped_affiliation == ["staff@test.de"]
     assert identity.idp_entity_id == IDP_EID
     assert identity.name_id == "u123-persistent"
+
+
+async def test_unsigned_assertion_is_rejected(certs, idp_metadata_file, make_idp):
+    """want_assertions_signed=True must reject a response with an unsigned assertion."""
+    settings = _settings(certs, idp_metadata_file)
+    engine = SamlEngine(settings)
+    reqid, _ = await engine.create_authn_request(relay_state="/app")
+
+    idp = make_idp(engine.sp_metadata())
+    saml_response = mint_response(
+        idp,
+        reqid,
+        ava={"eduPersonPrincipalName": ["u123@test.de"]},
+        sign_response=False,
+        sign_assertion=False,
+    )
+
+    with pytest.raises(SignatureError):
+        await engine.parse_response(saml_response, outstanding={reqid: "/app"})

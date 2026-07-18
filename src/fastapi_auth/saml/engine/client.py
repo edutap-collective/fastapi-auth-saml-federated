@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 import anyio.to_thread
@@ -19,6 +20,29 @@ from fastapi_auth.saml.engine.config import build_sp_config
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.settings import SamlSettings
+
+
+def _extract_authn_instant(authn_info: list[Any]) -> datetime | None:
+    """Best-effort extraction of the authn instant from pysaml2's authn_info.
+
+    ``authn_info`` is a list of ``(class_ref, authn_authorities, authn_instant)``
+    tuples. Defensive because pysaml2 is untyped and the shape is not
+    guaranteed across versions; never raises on unexpected input.
+    """
+    if not authn_info:
+        return None
+    entry = authn_info[0]
+    if not isinstance(entry, tuple) or len(entry) < 3:
+        return None
+    raw = entry[2]
+    if isinstance(raw, datetime):
+        return raw
+    if isinstance(raw, str):
+        try:
+            return datetime.fromisoformat(raw)
+        except ValueError:
+            return None
+    return None
 
 
 def to_identity(resp: Any) -> FederatedIdentity:
@@ -36,6 +60,7 @@ def to_identity(resp: Any) -> FederatedIdentity:
         name_id=name_id.text if name_id is not None else None,
         name_id_format=name_id.format if name_id is not None else None,
         idp_entity_id=resp.issuer(),
+        authn_instant=_extract_authn_instant(authn_info),
         authn_context_class=authn_class,
         assertion_id=resp.assertion.id if resp.assertion is not None else None,
     )
