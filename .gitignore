@@ -208,3 +208,6 @@ __marimo__/
 
 # uv lockfile — library, consumers resolve themselves
 uv.lock
+
+# test-time generated SAML keys/certs — never commit
+tests/certs/
