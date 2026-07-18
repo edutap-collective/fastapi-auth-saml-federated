@@ -68,3 +68,9 @@ addopts = "-ra"
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+filterwarnings = [
+    "error",
+    # Upstream Starlette/httpx transition: FastAPI's TestClient still imports httpx (0.x);
+    # Starlette nudges toward httpx2. Not our code. Revisit when the ecosystem settles.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated:Warning",
+]
