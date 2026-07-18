@@ -9,6 +9,8 @@ def test_empty_identity_has_sane_defaults():
     assert ident.mail == []
     assert ident.scoped_affiliation == []
     assert ident.attributes == {}
+    assert ident.organization == []
+    assert ident.personal_unique_id == []
 
 
 def test_identity_holds_values():

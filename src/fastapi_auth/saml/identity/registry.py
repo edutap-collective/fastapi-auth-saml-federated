@@ -100,12 +100,19 @@ REGISTRY: tuple[AttributeDef, ...] = (
         "urn:oid:1.3.6.1.4.1.25178.1.2.14",
         True,
     ),
+    AttributeDef(
+        "personal_unique_id",
+        "schacPersonalUniqueID",
+        "urn:oid:1.3.6.1.4.1.25178.1.2.15",
+        True,
+    ),
     # --- Core / LDAP ---
     AttributeDef("mail", "mail", "urn:oid:0.9.2342.19200300.100.1.3", True),
     AttributeDef("display_name", "displayName", "urn:oid:2.16.840.1.113730.3.1.241", False),
     AttributeDef("given_name", "givenName", "urn:oid:2.5.4.42", False),
     AttributeDef("surname", "sn", "urn:oid:2.5.4.4", False),
     AttributeDef("common_name", "cn", "urn:oid:2.5.4.3", False),
+    AttributeDef("organization", "o", "urn:oid:2.5.4.10", True),
     AttributeDef(
         "preferred_language",
         "preferredLanguage",

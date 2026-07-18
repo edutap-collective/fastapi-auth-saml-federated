@@ -37,11 +37,13 @@ class FederatedIdentity(BaseModel):
     common_name: str | None = None
     orcid: list[str] = Field(default_factory=list)
     preferred_language: str | None = None
+    organization: list[str] = Field(default_factory=list)
 
     # --- SCHAC / organization ---
     home_organization: str | None = None
     home_organization_type: list[str] = Field(default_factory=list)
     personal_unique_code: list[str] = Field(default_factory=list)
+    personal_unique_id: list[str] = Field(default_factory=list)
 
     # --- SAML metadata ---
     name_id: str | None = None
