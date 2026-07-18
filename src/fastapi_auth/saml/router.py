@@ -17,13 +17,14 @@ _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
 
 
 def _safe_local_path(value: str) -> str:
-    """Return value only if it is a safe same-origin local path, else '/'.
+    r"""Return value only if it is a safe same-origin local path, else '/'.
 
-    Blocks open-redirect vectors such as protocol-relative URLs (``//evil.com``)
-    and absolute URLs (``https://evil.com``). Cross-host allowlisting is
-    deferred to Plan 3 — this is only the local-path guard.
+    Rejects protocol-relative ("//host") and backslash-variant ("/\\host")
+    values, which browsers resolve to an absolute cross-origin URL.
+    Blocks open-redirect vectors such as absolute URLs (``https://evil.com``).
+    Cross-host allowlisting is deferred to Plan 3 — this is only the local-path guard.
     """
-    if value.startswith("/") and not value.startswith("//"):
+    if value.startswith("/") and not value.startswith(("//", "/\\")):
         return value
     return "/"
 

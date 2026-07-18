@@ -2,11 +2,13 @@
 
 from urllib.parse import parse_qs, urlparse
 
+import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from tests.conftest import IDP_EID, mint_response
 
 from fastapi_auth.saml.identity.model import FederatedIdentity
+from fastapi_auth.saml.router import _safe_local_path
 from fastapi_auth.saml.settings import SamlSettings
 from fastapi_auth.saml.sp import SamlSP
 
@@ -151,3 +153,23 @@ def test_acs_relay_state_open_redirect_is_sanitized(certs, idp_metadata_file, ma
     )
     assert acs.status_code == 303
     assert acs.headers["location"] == "/"
+
+
+@pytest.mark.parametrize(
+    "input_path,expected",
+    [
+        # Safe paths — returned unchanged
+        ("/", "/"),
+        ("/app", "/app"),
+        ("/a/b?x=1", "/a/b?x=1"),
+        # Unsafe paths — normalized to "/"
+        ("//evil.com", "/"),
+        ("https://evil.com", "/"),
+        ("/\\evil.com", "/"),
+        ("\\\\evil.com", "/"),
+        ("http://x", "/"),
+    ],
+)
+def test_safe_local_path_guards_open_redirects(input_path: str, expected: str) -> None:
+    """Verify _safe_local_path rejects protocol-relative, backslash, and absolute URLs."""
+    assert _safe_local_path(input_path) == expected
