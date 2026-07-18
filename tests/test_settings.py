@@ -42,3 +42,44 @@ def test_env_prefix(monkeypatch):
         monkeypatch.setenv(f"SAML_{k.upper()}", v)
     s = SamlSettings()
     assert s.entity_id == "urn:test:sp"
+
+
+def test_profile_defaults():
+    s = SamlSettings(**_BASE)
+    assert s.identifier == "subject_id"
+    assert s.identifier_fallback == ["pairwise_id", "eppn"]
+    assert s.required_attributes == []
+    assert s.entity_categories == []
+    assert s.allowed_redirect_hosts == []
+
+
+def test_encryption_files_default_to_signing_pair():
+    s = SamlSettings(**_BASE)
+    assert s.enc_key_file == s.key_file
+    assert s.enc_cert_file == s.cert_file
+
+
+def test_encryption_files_override():
+    s = SamlSettings(
+        **cast(
+            dict[str, Any],
+            {**_BASE, "encryption_key_file": "/tmp/enc.key", "encryption_cert_file": "/tmp/enc.crt"},
+        )
+    )
+    assert s.enc_key_file == "/tmp/enc.key"
+    assert s.enc_cert_file == "/tmp/enc.crt"
+
+
+def test_profile_lists_from_values():
+    s = SamlSettings(
+        **cast(
+            dict[str, Any],
+            {
+                **_BASE,
+                "required_attributes": ["eduPersonPrincipalName", "mail"],
+                "entity_categories": ["code-of-conduct"],
+            },
+        )
+    )
+    assert s.required_attributes == ["eduPersonPrincipalName", "mail"]
+    assert s.entity_categories == ["code-of-conduct"]
