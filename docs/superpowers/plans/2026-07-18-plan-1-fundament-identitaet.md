@@ -89,7 +89,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0 OR EUPL-1.2"
 license-files = ["LICENSE-APACHE", "LICENSE-EUPL"]
-authors = [{ name = "Alexander Löchel", email = "Alexander.Loechel@lmu.de" }]
+authors = [{ name = "Alexander Loechel", email = "Alexander.Loechel@lmu.de" }]
 keywords = ["saml", "saml2", "shibboleth", "edugain", "fastapi", "sso", "federation", "eduperson", "schac"]
 classifiers = [
     "Framework :: FastAPI",
