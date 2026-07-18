@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -21,6 +22,8 @@ from fastapi_auth.saml.engine.errors import SamlResponseError
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.settings import SamlSettings
+
+logger = logging.getLogger("fastapi_auth.saml")
 
 
 def _extract_authn_instant(authn_info: list[Any]) -> datetime | None:
@@ -104,6 +107,7 @@ class SamlEngine:
                 saml_response, BINDING_HTTP_POST, outstanding=outstanding
             )
         except Exception as err:  # pysaml2 raises many types on bad/forged input
+            logger.warning("SAML response parse/validation failed: %s", err)
             raise SamlResponseError(str(err)) from err
         if resp is None:
             raise SamlResponseError("SAML response could not be parsed")

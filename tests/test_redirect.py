@@ -26,3 +26,11 @@ def test_absolute_url_allowed_when_host_in_allowlist():
 
 def test_absolute_url_rejected_when_host_not_in_allowlist():
     assert is_safe_redirect("https://evil.com/x", ["app.lmu.de"]) == "/"
+
+
+def test_allowlist_comparison_is_case_insensitive():
+    assert is_safe_redirect("https://app.lmu.de/x", ["APP.LMU.DE"]) == "https://app.lmu.de/x"
+
+
+def test_control_character_in_value_normalized_to_root():
+    assert is_safe_redirect("/\t/evil.com", []) == "/"

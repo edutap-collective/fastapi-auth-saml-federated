@@ -44,6 +44,8 @@ class SamlSettings(BaseSettings):
     session_secret: str
     session_ttl: int = 28800
     cookie_secure: bool = True
+    # In-flight AuthnRequest lifetime (seconds); short-lived, unrelated to session_ttl.
+    outstanding_ttl: int = 300
 
     # --- crypto / security ---
     xmlsec_binary: str = Field(default_factory=_default_xmlsec)

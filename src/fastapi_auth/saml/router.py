@@ -5,6 +5,7 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import TYPE_CHECKING, Annotated
 
@@ -19,6 +20,8 @@ if TYPE_CHECKING:
     from fastapi_auth.saml.sp import SamlSP
 
 _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
+
+logger = logging.getLogger("fastapi_auth.saml")
 
 
 def build_router(sp: SamlSP) -> APIRouter:
@@ -37,15 +40,17 @@ def build_router(sp: SamlSP) -> APIRouter:
         SAMLResponse: Annotated[str, Form()],
         RelayState: Annotated[str, Form()] = "/",
     ) -> RedirectResponse:
-        await sp.store.purge_expired(sp.settings.session_ttl, time.monotonic())
+        await sp.store.purge_expired(sp.settings.outstanding_ttl, time.monotonic())
         outstanding = await sp.store.outstanding()
         try:
             identity, in_response_to = await sp.engine.parse_response(SAMLResponse, outstanding)
         except SamlResponseError as err:
+            logger.warning("SAML response rejected at ACS: %s", err)
             raise HTTPException(status_code=400, detail="Invalid SAML response") from err
         try:
             check_required_attributes(identity, sp.settings.required_attributes)
         except AttributeReleaseError as err:
+            logger.warning("Attribute release insufficient, missing: %s", err.missing)
             raise HTTPException(status_code=403, detail=str(err)) from err
         await sp.store.pop_outstanding(in_response_to)
         target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)

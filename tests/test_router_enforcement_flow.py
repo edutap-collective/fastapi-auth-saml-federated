@@ -31,17 +31,19 @@ def _login_and_get_reqid(client, sp):
     return next(iter(sp.store._outstanding))  # noqa: SLF001
 
 
-def test_acs_403_when_mandatory_missing(certs, idp_metadata_file, make_idp):
+def test_acs_403_when_mandatory_missing(certs, idp_metadata_file, make_idp, caplog):
     app, sp = _app(certs, idp_metadata_file, ["eduPersonPrincipalName", "mail"])
     client = TestClient(app)
     reqid = _login_and_get_reqid(client, sp)
     idp = make_idp(sp.engine.sp_metadata())
     resp = mint_response(idp, reqid, ava={"eduPersonPrincipalName": ["u@test.de"]})  # no mail
-    r = client.post(
-        "/saml/acs", data={"SAMLResponse": resp, "RelayState": "/app"}, follow_redirects=False
-    )
+    with caplog.at_level("WARNING", logger="fastapi_auth.saml"):
+        r = client.post(
+            "/saml/acs", data={"SAMLResponse": resp, "RelayState": "/app"}, follow_redirects=False
+        )
     assert r.status_code == 403
     assert "mail" in r.text
+    assert "mail" in caplog.text
 
 
 def test_acs_success_when_all_present(certs, idp_metadata_file, make_idp):

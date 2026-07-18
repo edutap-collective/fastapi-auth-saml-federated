@@ -27,11 +27,17 @@ def _app(certs, idp_metadata_file):
     return app
 
 
-def test_acs_garbage_response_is_400(certs, idp_metadata_file):
+def test_acs_garbage_response_is_400(certs, idp_metadata_file, caplog):
     app = _app(certs, idp_metadata_file)
     client = TestClient(app)
     garbage = base64.b64encode(b"<not-a-saml-response/>").decode()
-    r = client.post(
-        "/saml/acs", data={"SAMLResponse": garbage, "RelayState": "/app"}, follow_redirects=False
-    )
+    with caplog.at_level("WARNING", logger="fastapi_auth.saml"):
+        r = client.post(
+            "/saml/acs",
+            data={"SAMLResponse": garbage, "RelayState": "/app"},
+            follow_redirects=False,
+        )
     assert r.status_code == 400
+    # The rejection is logged for ops diagnosis, but never the raw SAMLResponse body.
+    assert "SAML response" in caplog.text
+    assert garbage not in caplog.text

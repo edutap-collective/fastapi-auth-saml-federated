@@ -41,3 +41,13 @@ async def test_purge_expired_drops_old_entries_and_keeps_fresh_ones():
     await store.add_outstanding("fresh", "/fresh", 100.0)
     await store.purge_expired(ttl_seconds=60, now=100.0)
     assert await store.outstanding() == {"fresh": "/fresh"}
+
+
+async def test_purge_expired_uses_dedicated_outstanding_ttl_boundary():
+    """An outstanding AuthnRequest created at t=0 is purged once now - created > ttl."""
+    store = MemoryStore()
+    await store.add_outstanding("req", "/app", 0.0)
+    await store.purge_expired(ttl_seconds=300, now=299.0)
+    assert await store.outstanding() == {"req": "/app"}
+    await store.purge_expired(ttl_seconds=300, now=301.0)
+    assert await store.outstanding() == {}
