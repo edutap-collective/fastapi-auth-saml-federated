@@ -291,7 +291,18 @@ Security:  clock_skew, want_assertions_signed=True, allowed_redirect_hosts[]
   (Redirects + Formular-Parsing); embedded WAYF ggf. Playwright. Deckt zugleich
   den **bilateralen Einzel-IdP-Pfad** (`source='direct'` + `passthrough`) ab,
   daneben ein MDQ-Szenario für den föderierten Pfad.
-- **E2E** (dokumentiert, nightly/manuell): How-to zur SP-Registrierung in der
+- **High-Fidelity-Check gegen echten Shibboleth** (dokumentiert, manuell):
+  Wiederverwendung des bestehenden **`lmuidp-container`** (LMU Shibboleth IdP 5.1.6,
+  LMU-Directory-Schema, `subject-id`/`pairwise-id`/`eppn` real). Anbindung im
+  `source='direct'` + `passthrough`-Modus:
+  - IdP-EntityID `urn:lmu.de:testidp`, IdP auf Host-Port **10444** (Container
+    `8443`), Start via `./gradlew composeUp`.
+  - Unseren SP registrieren: `<EntityDescriptor>` aus `/saml/metadata` in
+    `test/idp-test/metadata/metadata.xml` des Containers eintragen (bilateral).
+  - Testlogin: `i.reska` / `shampoo1` (alle Testnutzer Passwort `shampoo1`).
+  - Repo: `gitlab.lrz.de:LMU-Dez-VI/Ref.-VI.4/lmuidp-container`; schwer
+    (16 GB+, Java-Build) → bewusst nicht im automatisierten CI.
+- **E2E föderiert** (dokumentiert, manuell): How-to zur SP-Registrierung in der
   **DFN-AAI-Testföderation**, Test gegen deren Test-IdP + zentralen DS + MDQ.
   Nicht im PR-CI (nicht deterministisch, netzabhängig, Zertifikate nötig).
 
