@@ -107,7 +107,7 @@ class SamlSettings(BaseSettings):
     @model_validator(mode="after")
     def _check_jwt_secret_strength(self) -> SamlSettings:
         """Validate that JWT backend has a strong enough secret."""
-        if self.backend == "jwt" and len(self.jwt_signing_secret) < 32:
+        if self.backend == "jwt" and len(self.jwt_signing_secret.encode()) < 32:
             msg = "JWT backend requires jwt_secret/session_secret of at least 32 bytes"
             raise ValueError(msg)
         return self

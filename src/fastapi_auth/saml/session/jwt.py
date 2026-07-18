@@ -16,7 +16,19 @@ from fastapi_auth.saml.settings import SamlSettings
 
 
 class JWTBackend:
-    """Carries the identity in a signed JWT (cookie or Authorization: Bearer)."""
+    """Carries the identity in a signed JWT (cookie or Authorization: Bearer).
+
+    The default ``jwt_alg`` (``HS256``) is a symmetric algorithm: anyone who can
+    verify the token can also mint one. An asymmetric algorithm (e.g. RS256,
+    EdDSA) with a separate signing/verification key pair would be needed to
+    let other services verify tokens without being able to forge them; that is
+    not implemented here.
+
+    The token is signed, not encrypted: it carries the full identity
+    (``attrs``) in plaintext, readable by whoever holds it. For
+    attribute-rich identities this can approach the ~4 KB size limit typical
+    for browser cookies.
+    """
 
     def __init__(self, settings: SamlSettings) -> None:
         """Initialize the JWT backend with the given settings."""
