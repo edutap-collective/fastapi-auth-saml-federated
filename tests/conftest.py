@@ -4,6 +4,7 @@ import base64
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
 from saml2 import BINDING_HTTP_REDIRECT
@@ -113,13 +114,20 @@ def mint_response(
     *,
     sign_response: bool = True,
     sign_assertion: bool = True,
+    encrypt_cert: str | None = None,
 ) -> str:
     """Mint a base64 SAML response as an IdP would POST to the ACS.
 
     ``sign_response``/``sign_assertion`` default to ``True`` (a properly signed
     response); pass ``False`` to mint an unsigned one for negative tests.
+    ``encrypt_cert`` defaults to ``None`` (unencrypted assertion); pass the
+    SP's encryption certificate PEM to mint an ``EncryptedAssertion`` instead.
     """
     name_id = NameID(format=NAMEID_FORMAT_PERSISTENT, text=name_id_text)
+    extra_kwargs: dict[str, Any] = {}
+    if encrypt_cert is not None:
+        extra_kwargs["encrypt_assertion"] = True
+        extra_kwargs["encrypt_cert_assertion"] = encrypt_cert
     xml = idp.create_authn_response(
         identity=ava,
         in_response_to=request_id,
@@ -132,6 +140,7 @@ def mint_response(
             "class_ref": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
             "authn_auth": IDP_EID,
         },
+        **extra_kwargs,
     )
     # pysaml2 only returns a plain string when a signing step ran (it hands back
     # the signed_instance_factory output); an entirely unsigned response comes
