@@ -47,6 +47,7 @@ Namespace teilen können.
 | Achse             | Entscheidung                                                              |
 | ----------------- | ------------------------------------------------------------------------ |
 | SAML-Engine       | Wrapper um **`pysaml2`**, synchrone Calls via `anyio.to_thread.run_sync` |
+| Krypto-Backend    | ausschließlich **`xmlsec1`** (libxmlsec1) — volle Funktion inkl. Assertion-Decryption |
 | Session-Modell    | **Pluggable** `SessionBackend`: Cookie (Default) + JWT (Opt-in)          |
 | Metadaten/Trust   | **Konfigurierbar**: MDQ (Default) *oder* Aggregat-Datei                   |
 | Discovery         | **Extern (DS-Protocol, Default)** + Embedded-Picker + feste entityID     |
@@ -170,12 +171,47 @@ Eine kuratierte **Registry** kennt jedes Attribut unter beiden Schreibweisen
   `name_id`, `name_id_format`, `assertion_id`.
 - **Escape-Hatch:** `attributes: dict[str, list[str]]` mit allen rohen Attributen
   (friendly-name → Werte), plus optional roh-OID-Zugriff.
-- **`identifier`-Property:** wählt nach konfigurierbarer Präferenz den stabilen
-  Identifier: `subject-id → pairwise-id → eppn → persistent NameID`
-  (wichtig für Privacy & Persistenz).
+- **`identifier`-Property:** liefert den **pro SP explizit gewählten** stabilen
+  Identifier (siehe 5.1) — keine implizite Rate-Kette. Ein optionaler Fallback ist
+  konfigurierbar, aber die primäre Wahl ist deklariert.
 
 Für später (v1.1): generisches Consumer-Modell via Subclassing eines
 `FederatedIdentityBase` — additiv, ohne den Standardfall zu belasten.
+
+### 5.1 SP-Profil: Identifier & Attribut-Anforderungen (GDPR / DPCoCo)
+
+Wie im eduGAIN-/NREN-AAI-Kontext üblich, deklariert **jeder SP explizit**, welchen
+Identifier er nutzt und welche Attribute er anfordert — als Grundlage für
+Data Minimisation (GDPR) und die IdP-seitige Attribut-Freigabe.
+
+- **Expliziter Identifier:** `identifier` benennt das *primäre* Identifikator-Attribut
+  des SP (z. B. `pairwise-id` für pseudonyme Services, `subject-id`/`eppn` für
+  personalisierte). Optionaler, ebenfalls deklarierter `identifier_fallback`.
+- **Requested Attributes mit Pflicht/Optional:** je Attribut `required: bool`
+  (mandatory vs. optional). Wird 1:1 als `<md:RequestedAttribute isRequired="…">`
+  in den `<md:AttributeConsumingService>` der SP-Metadaten emittiert.
+- **Entity Categories / `mdui` / Privacy:** deklarierte Kategorien (REFEDS R&S,
+  Data Protection Code of Conduct, Personalized/Pseudonymous/Anonymous Access),
+  `mdui`-Angaben (DisplayName, Description, Logo) und `privacy_statement_url` —
+  Voraussetzung, damit IdPs Attribute überhaupt freigeben.
+- **Enforcement am ACS:** fehlt ein **mandatory**-Attribut in der Assertion, wird
+  der Login **abgelehnt** (`AttributeReleaseError` → klare Fehlermeldung mit den
+  fehlenden Attributen). Optionale Attribute füllen `FederatedIdentity` nur, wenn
+  vorhanden.
+
+```python
+sp = saml.SamlSP(SamlSettings(
+    identifier="pairwise-id",                       # explizit gewählt
+    requested_attributes=[
+        saml.Attr("eduPersonScopedAffiliation", required=True),
+        saml.Attr("mail",                        required=True),
+        saml.Attr("displayName",                 required=False),
+        saml.Attr("schacHomeOrganization",       required=False),
+    ],
+    entity_categories=["refeds-personalized-access", "code-of-conduct"],
+    privacy_statement_url="https://service.lmu.de/privacy",
+))
+```
 
 ## 6. Session-Layer (`session/`)
 
@@ -203,7 +239,9 @@ Dependencies: `current_user` (401 wenn nicht eingeloggt), `optional_user`,
 ## 7. Sicherheit
 
 `pysaml2`/`xmlsec1` übernehmen die kryptografische Schwerarbeit; wir konfigurieren
-strikt und validieren die Rahmenbedingungen:
+strikt und validieren die Rahmenbedingungen. Krypto-Backend ist **ausschließlich
+`xmlsec1`** (libxmlsec1) — bewusst kein pure-Python-Backend, damit
+Assertion-Decryption stets verfügbar ist und nur eine getestete Code-Bahn existiert:
 
 - Response-/Assertion-**Signatur** gegen IdP-Metadaten-Cert; unsignierte Assertions
   ablehnen (`WantAssertionsSigned`).
@@ -234,7 +272,10 @@ Discovery: mode = 'external' | 'embedded' | 'passthrough'
 Session:   backend = 'cookie' | 'jwt'
            store = 'memory' | 'redis' | 'postgres'
            cookie_name, cookie_secure, jwt_alg, jwt_ttl, session_ttl, redis_url, db_url
-Attribute: requested_attributes[], entity_categories[] (R&S, CoCo, Personalized Access)
+SP-Profil: identifier, identifier_fallback
+           requested_attributes[] mit required:bool (mandatory/optional)
+           entity_categories[] (R&S, CoCo, Personalized/Pseudonymous/Anonymous Access)
+           mdui (display_name, description, logo), privacy_statement_url
 Security:  clock_skew, want_assertions_signed=True, allowed_redirect_hosts[]
 ```
 
@@ -272,6 +313,9 @@ Security:  clock_skew, want_assertions_signed=True, allowed_redirect_hosts[]
 - Discovery: externer DS + Passthrough + **embedded WAYF (opt-in)**
 - Session: Cookie (Default) + JWT (opt-in); Store memory/redis/postgres
 - Typisierte `FederatedIdentity` + Attribut-Registry (eduPerson/SCHAC/subject-id)
+- **SP-Profil (GDPR):** expliziter Identifier + Requested Attributes (mandatory/optional)
+  in SP-Metadaten, Entity Categories/mdui/Privacy-URL, **Attribut-Release-Enforcement**
+  am ACS (mandatory fehlt → Login-Ablehnung)
 - SP-Metadaten-Endpoint, Assertion-Decryption, signierte Requests
 - Best-effort SLO (lokale Session-Invalidierung immer; SAML-SLO wo IdP es kann)
 - Security-Validierungen, Docker-Integration, DFN-Test-Doku
@@ -287,8 +331,10 @@ Security:  clock_skew, want_assertions_signed=True, allowed_redirect_hosts[]
 
 - **`pysaml2` ist synchron & schwergewichtig** — akzeptierter Trade-off; via
   `anyio.to_thread.run_sync` gekapselt. Wartungsstand vor Release prüfen.
-- `libxmlsec1`-Systemabhängigkeit erschwert reine `pip`-Installs — Docker + Doku
-  entschärfen das.
+- `libxmlsec1`-Systemabhängigkeit (harte Voraussetzung, da xmlsec1-only): heute
+  weitgehend entschärft durch `python-xmlsec`-manylinux-Wheels (gebündeltes
+  libxmlsec1, meist kein `apt` nötig); Docker + Doku decken den Rest ab. Ein
+  pure-Python-Backend wurde bewusst verworfen (kein Decryption-Support).
 - SLO in Föderationen ist notorisch unzuverlässig → bewusst nur best-effort.
 - `SameSite`-Cookie-Verhalten am ACS (cross-site POST) sorgfältig testen.
 - DFN-AAI-Testföderation braucht Registrierung/Zertifikate → nur E2E, nicht CI.
