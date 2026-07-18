@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#" class="t-ventuno">
+  <head>
+    <meta charset="utf-8" />
+<noscript><style>form.antibot > * { display: none !important; } form.antibot noscript { display: block !important; }</style>
+</noscript><link rel="canonical" href="https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12" />
+<meta property="og:site_name" content="Interoperable Europe Portal" />
+<meta property="og:type" content="Custom page" />
+<meta property="og:url" content="https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12" />
+<meta property="og:title" content="EUPL text (EUPL-1.2)" />
+<meta property="og:image" content="https://interoperable-europe.ec.europa.eu/themes/ventuno/assets/images/og-image.png" />
+<meta property="og:image:secure_url" content="https://interoperable-europe.ec.europa.eu/themes/ventuno/assets/images/og-image.png" />
+<meta property="og:image:type" content="image/svg+xml" />
+<meta name="Generator" content="Drupal 11 (https://www.drupal.org)" />
+<meta name="MobileOptimized" content="width" />
+<meta name="HandheldFriendly" content="true" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/themes/ventuno/favicon.ico" type="image/vnd.microsoft.icon" />
+<link rel="alternate" hreflang="en" href="https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12" />
+<script type="text/javascript">window.MSInputMethodContext && document.documentMode && document.write("\u003Clink rel=\u0022stylesheet\u0022 href=\u0022https:\/\/interoperable-europe.ec.europa.eu\/themes\/contrib\/oe_bootstrap_theme\/assets\/css\/bootstrap-ie11.css\u0022\u003E\u003Cscript src=\u0022https:\/\/cdn.jsdelivr.net\/combine\/npm\/ie11-custom-properties@4,npm\/element-qsa-scope@1\u0022\u003E\u003C\/script\u003E\u003Cscript crossorigin=\u0022anonymous\u0022 src=\u0022https:\/\/cdnjs.cloudflare.com\/polyfill\/v3\/polyfill.min.js?version=3.111.0\u0026features=Array.prototype.find%2CArray.prototype.includes%2CNumber.parseFloat%2CNumber.parseInt%2Cdefault\u0022\u003E\u003C\/script\u003E");</script>
+
+    <title>EUPL text (EUPL-1.2) | Interoperable Europe Portal</title>
+    <link rel="stylesheet" media="all" href="/sites/default/files/css/css_bjdwm-0dC85k2rh-ETy2RWm2v6myyvAbYT8o8hirqfU.css?delta=0&amp;language=en&amp;theme=ventuno&amp;include=eJx1kVtuxCAMRTcEw5KQEzzELWCEzUyz-zIPhbRVfxD3-CH7ekFVbB6_KgsGf6U0pLiIBRsk88FUevWC0NbNxca92gVCRFOhQWxQN3Gh9QrpMsmll9qXRLJhMJVTOlLG3yYqn2JeLT1U8tCVV841oaL7hxshxTsF9JCwqaNCaoRXguQzBgL_bOv-ootumEf9LorZLSBolHtzulELdgyt-xuMx4ruoyqaGxbthR0sog1WPcBr-6lkisesXIaQA10JUxBUKxvfbeY2s6_Mw-qTbHnWPZ3-qYbvpZwKEuzc51wZS7eWo7UFbhRBicsMPqKHGgkLtF_Svow_03cXu7Aq5yNSIaJV0oQn9D79QRSWhHOf5w2-Aame9AI" />
+<link rel="stylesheet" media="all" href="/sites/default/files/css/css_HarA4zJRng8nhZwaBwFLzGR4cH9T6co82A2Xi8tw6Js.css?delta=1&amp;language=en&amp;theme=ventuno&amp;include=eJx1kVtuxCAMRTcEw5KQEzzELWCEzUyz-zIPhbRVfxD3-CH7ekFVbB6_KgsGf6U0pLiIBRsk88FUevWC0NbNxca92gVCRFOhQWxQN3Gh9QrpMsmll9qXRLJhMJVTOlLG3yYqn2JeLT1U8tCVV841oaL7hxshxTsF9JCwqaNCaoRXguQzBgL_bOv-ootumEf9LorZLSBolHtzulELdgyt-xuMx4ruoyqaGxbthR0sog1WPcBr-6lkisesXIaQA10JUxBUKxvfbeY2s6_Mw-qTbHnWPZ3-qYbvpZwKEuzc51wZS7eWo7UFbhRBicsMPqKHGgkLtF_Svow_03cXu7Aq5yNSIaJV0oQn9D79QRSWhHOf5w2-Aame9AI" />
+
+    <script src="https://webtools.europa.eu/load.js" defer></script>
+
+        <link rel="icon" type="image/png" sizes="16x16" href="/themes/ventuno/assets/images/favicon/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/themes/ventuno/assets/images/favicon/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="96x96" href="/themes/ventuno/assets/images/favicon/favicon-96x96.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/themes/ventuno/assets/images/favicon/android-chrome-192x192.png" />
+<link rel="apple-touch-icon" sizes="57x57" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-57x57.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-60x60.png" />
+<link rel="apple-touch-icon" sizes="114x114" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-114x114.png" />
+<link rel="apple-touch-icon" sizes="120x120" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" sizes="144x144" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-144x144.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-152x152.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/themes/ventuno/assets/images/favicon/apple-touch-icon-180x180.png" />
+<meta name="msapplication-wide310x150logo" content="/themes/ventuno/assets/images/favicon/mstile-310x150.png" />
+<meta name="msapplication-square150x150logo" content="/themes/ventuno/assets/images/favicon/mstile-150x150.png" />
+<meta name="msapplication-square310x310logo" content="/themes/ventuno/assets/images/favicon/mstile-310x310.png" />
+<meta name="msapplication-square70x70logo" content="/themes/ventuno/assets/images/favicon/mstile-70x70.png" />
+<meta name="msapplication-TileImage" content="/themes/ventuno/assets/images/favicon/mstile-144x144.png" />
+
+  </head>
+  <body class="user-anonymous">
+        <a href="#main-content" class="visually-hidden focusable">
+      Skip to main content
+    </a>
+    <script type="application/json">{"utility":"globan","theme":"dark","logo":true,"link":true,"mode":false}</script>
+
+      <div data-off-canvas-main-canvas>
+    <div data-joinup-group-context="723254" class="layout-container">
+  
+<div class="bcl-header bcl-header--ec">
+  <div role="complementary" class="w-100 shadow-sm navbar navbar-expand-lg navbar-light py-0" aria-label="Site branding">
+    <div class="container">
+      <div class="d-flex w-100 justify-content-between align-items-end">
+        <a class="navbar-brand py-0" href="https://ec.europa.eu/info/index_en" aria-label="Visit European Commission website">
+          <img src="/themes/ventuno/assets/images/logo-ec/logo-ec-en.svg" alt="European Commission logo" width="100" height="25" loading="eager" fetchpriority="high" />
+        </a>
+              </div>
+    </div>
+  </div>
+</div>
+    
+
+
+
+
+  
+
+
+
+  
+  
+  
+  
+
+<header
+   class="joinup-navbar navbar navbar-expand navbar--sticky" aria-label="Main header"
+>
+  <div class="container">
+    <div class="d-flex">
+            <a class="navbar-brand" href="/" title="Interoperable Europe Portal">
+        <img class="navbar-brand-image" src="/themes/ventuno/assets/images/logo-interoperable-europe.svg" alt="Interoperable Europe logo" />
+      </a>
+          </div>
+    <nav id="main-navbar" aria-label="Main navigation">
+      <ul
+         class="navbar-nav" id="main-navbar-list"
+      >
+                                                                                                      
+                <li class="nav-item d-none d-xl-inline-block dropdown">
+                                                          
+                                                                                                          
+                    <a href="/interoperable-europe" aria-expanded="false" id="49950 Policy menu_link_content:3a82854a-9339-493f-8a29-d218ec691578" role="button" class="nav-link nav-link--underline dropdown-toggle" data-drupal-link-system-path="node/723208">Policy</a>
+                                          <ul class="dropdown-menu dropdown-menu--sub" aria-labelledby="49950 Policy menu_link_content:3a82854a-9339-493f-8a29-d218ec691578">
+                                                                                                      <li>
+                            <a href="/interoperable-europe/latest-news" class="dropdown-item" data-drupal-link-system-path="node/704825">News</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/interoperable-europe/events" class="dropdown-item" data-drupal-link-system-path="node/704828">Events</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/interoperable-europe/interoperable-europe-act" class="dropdown-item" data-drupal-link-system-path="node/704810">Interoperable Europe Act</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/ai-public-sector" class="dropdown-item" data-drupal-link-system-path="node/732729">AI in the public sector</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/interoperable-europe/faqs" class="dropdown-item" data-drupal-link-system-path="node/705810">FAQs</a>
+                          </li>
+                                              </ul>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block dropdown">
+                                                          
+                                                                                                          
+                    <a href="/interoperable_solutions" aria-expanded="false" id="49951 Solutions menu_link_content:a347873b-c823-474c-952f-91b927397a85" role="button" class="nav-link nav-link--underline dropdown-toggle" data-drupal-link-system-path="node/707332">Solutions</a>
+                                          <ul class="dropdown-menu dropdown-menu--sub" aria-labelledby="49951 Solutions menu_link_content:a347873b-c823-474c-952f-91b927397a85">
+                                                                                                      <li>
+                            <a href="/interoperable-europe-solutions" class="dropdown-item" data-drupal-link-system-path="node/730988">Interoperable Europe Solutions</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/interoperability-solutions-catalogue" class="dropdown-item" data-drupal-link-system-path="node/707671">EU Interoperability Solutions Catalogue</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/eu-oss-catalogue" class="dropdown-item" data-drupal-link-system-path="node/723282">EU Open Source Solutions Catalogue</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/guidelines-sharing-interoperability-solutions" class="dropdown-item" data-drupal-link-system-path="node/734044">Guidelines on Sharing Interoperability Solutions</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/eupl" class="dropdown-item">European Public Licence (EUPL)</a>
+                          </li>
+                                              </ul>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block dropdown">
+                                                          
+                                                                                                          
+                    <a href="/interoperable-europe-support-centre" aria-expanded="false" id="49952 Support Centre menu_link_content:384488ef-3150-421c-8234-c94aea24323a" role="button" class="nav-link nav-link--underline dropdown-toggle" data-drupal-link-system-path="node/707239">Support Centre</a>
+                                          <ul class="dropdown-menu dropdown-menu--sub" aria-labelledby="49952 Support Centre menu_link_content:384488ef-3150-421c-8234-c94aea24323a">
+                                                                                                      <li>
+                            <a href="/collection/portal-support" class="dropdown-item" data-drupal-link-system-path="node/723169">Portal support</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/semic-support-centre" class="dropdown-item" data-drupal-link-system-path="node/723171">Semantics (SEMIC)</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/open-source-observatory-osor" class="dropdown-item">Open source (OSOR)</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/iopeu-monitoring/european-interoperability-framework-detail" class="dropdown-item">European Interoperability Framework (EIF)</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/iopeu-monitoring" class="dropdown-item" data-drupal-link-system-path="node/723255">Monitoring</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/public-sector-tech-watch" class="dropdown-item">Public Sector Tech Watch</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/eugovtech" class="dropdown-item">GovTech</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/digital-ready-policymaking" class="dropdown-item" data-drupal-link-system-path="node/723280">Digital Ready Policy Making</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/interoperability-architecture-solutions" class="dropdown-item" data-drupal-link-system-path="node/723242">Architecture solutions (CAMSS, TestBed, EIRA)</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/interoperability-regulatory-sandboxes" class="dropdown-item" data-drupal-link-system-path="node/726680">Regulatory sandboxes</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/discussions" class="dropdown-item" data-drupal-link-system-path="discussions">Forum</a>
+                          </li>
+                                              </ul>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block dropdown">
+                                                          
+                                                                                                          
+                    <a href="/governance" aria-expanded="false" id="49953 Governance menu_link_content:6d93a9e7-9c03-48f1-a608-e89ffd8d9dce" role="button" class="nav-link nav-link--underline dropdown-toggle" data-drupal-link-system-path="node/726450">Governance</a>
+                                          <ul class="dropdown-menu dropdown-menu--sub" aria-labelledby="49953 Governance menu_link_content:6d93a9e7-9c03-48f1-a608-e89ffd8d9dce">
+                                                                                                      <li>
+                            <a href="/collection/governance-board" class="dropdown-item" data-drupal-link-system-path="node/723291">Board</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/community" class="dropdown-item" data-drupal-link-system-path="node/730669">Community</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/national-competent-authorities" class="dropdown-item" data-drupal-link-system-path="node/726499">National competent authorities</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/assessments" class="dropdown-item" data-drupal-link-system-path="node/723215">Assessments</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/eu-digital-funding-opportunities" class="dropdown-item" data-drupal-link-system-path="node/707954">Funding Opportunities</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/eu-digital-regulations" class="dropdown-item" data-drupal-link-system-path="node/734343">Landscape of EU digital regulations</a>
+                          </li>
+                                              </ul>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block dropdown">
+                                                          
+                                                                                                          
+                    <a href="/collection/interoperable-europe-academy/welcome" aria-expanded="false" id="49954 Academy menu_link_content:dae6b0bd-c43a-4c34-9ddb-86ef7f3c93ee" role="button" class="nav-link nav-link--underline dropdown-toggle" data-drupal-link-system-path="node/722966">Academy</a>
+                                          <ul class="dropdown-menu dropdown-menu--sub" aria-labelledby="49954 Academy menu_link_content:dae6b0bd-c43a-4c34-9ddb-86ef7f3c93ee">
+                                                                                                      <li>
+                            <a href="/collection/interoperable-europe-academy/learning-paths" class="dropdown-item" data-drupal-link-system-path="node/722968">Learning paths</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/interoperable-europe-academy/courses" class="dropdown-item">Courses</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/interoperable-europe-academy/policy-briefs" class="dropdown-item" data-drupal-link-system-path="node/729263">Policy briefs</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="/collection/interoperable-europe-academy/curriculum" class="dropdown-item" data-drupal-link-system-path="node/722965">Curriculum</a>
+                          </li>
+                                                                                                      <li>
+                            <a href="https://interoperable-europe.ec.europa.eu/collection/interoperable-europe-academy/event/interoperable-europe-seasonal-school-2026" class="dropdown-item">Seasonal school 2026</a>
+                          </li>
+                                              </ul>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block">
+                                                          
+                    
+                    <a href="/collection/semic-conference" class="nav-link nav-link--underline" data-drupal-link-system-path="node/730634">SEMIC 2026</a>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block">
+                                                          
+                    
+                    <a href="/eulogin?destination=/collection/eupl/eupl-text-eupl-12&amp;t=539b4130a9ae" class="sign-in-link nav-link nav-link--underline">Sign in</a>
+                    
+                                  </li>
+                                                                        
+                <li class="nav-item d-none d-xl-inline-block">
+                                      <button
+                      id="get-started"
+                      class="btn btn-light get-started__trigger"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      type="button"
+                      data-bs-auto-close="outside"
+                    >
+                      Get started
+                    </button>
+                    <div
+                      class="dropdown-menu get-started__menu pt-2 pb-3 px-3"
+                      aria-labelledby="get-started"
+                      data-popper-placement="right"
+                    >
+                      <p class="mb-1"><a class="get-started__cta fw-bold" href="/eulogin?destination=/collection/eupl/eupl-text-eupl-12&amp;t=52ccc86a5a13" tabindex=&quot;0&quot;>
+                        Create an account
+                        <svg class="bi icon--s ms-2">
+                          <use xlink:href="/themes/ventuno/assets/icons/icons.svg#arrow-right"></use>
+                        </svg>
+                      </a></p>
+                      <p class="get-started__description mb-0 fs-sm">As a signed-in user you can create content, become a member of a community, receive notifications on your favourite solutions and topics, and access all other features available on the platform.</p>
+                    </div>
+                                  </li>
+                                                                                                                                                  <li  class="nav-item dropdown d-xl-none mmenu-nav">
+              <button
+                id="navbar-toggler"
+                class="nav-link mmenu-nav__toggle"
+                type="button"
+                aria-label="Toggle menu"
+              >
+                <span class="visually-hidden">Toggle menu</span>
+                                  <svg class="bi icon--s">
+                    <use xlink:href="/themes/ventuno/assets/icons/icons.svg#justify"></use>
+                  </svg>
+                              </button>
+              <div class="mmenu-nav__menu p-0 d-none" aria-labelledby="navbar-toggler">
+                <ul>
+                                                            <li >
+                                                <a href="/" >
+                          Home
+                        </a>
+                                              </li>
+                                                                                <li >
+                                                <a href="/interoperable-europe" >
+                          Policy
+                        </a>
+                                                  <ul>
+                                                          <li >
+                                                                <a href="/interoperable-europe/latest-news" >
+                                  News
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/interoperable-europe/events" >
+                                  Events
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/interoperable-europe/interoperable-europe-act" >
+                                  Interoperable Europe Act
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/ai-public-sector" >
+                                  AI in the public sector
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/interoperable-europe/faqs" >
+                                  FAQs
+                                </a>
+                              </li>
+                                                      </ul>
+                                              </li>
+                                                                                <li >
+                                                <a href="/interoperable_solutions" >
+                          Solutions
+                        </a>
+                                                  <ul>
+                                                          <li >
+                                                                <a href="/interoperable-europe-solutions" >
+                                  Interoperable Europe Solutions
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/interoperability-solutions-catalogue" >
+                                  EU Interoperability Solutions Catalogue
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/eu-oss-catalogue" >
+                                  EU Open Source Solutions Catalogue
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/guidelines-sharing-interoperability-solutions" >
+                                  Guidelines on Sharing Interoperability Solutions
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/eupl" >
+                                  European Public Licence (EUPL)
+                                </a>
+                              </li>
+                                                      </ul>
+                                              </li>
+                                                                                <li >
+                                                <a href="/interoperable-europe-support-centre" >
+                          Support Centre
+                        </a>
+                                                  <ul>
+                                                          <li >
+                                                                <a href="/collection/portal-support" >
+                                  Portal support
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/semic-support-centre" >
+                                  Semantics (SEMIC)
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/open-source-observatory-osor" >
+                                  Open source (OSOR)
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/iopeu-monitoring/european-interoperability-framework-detail" >
+                                  European Interoperability Framework (EIF)
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/iopeu-monitoring" >
+                                  Monitoring
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/public-sector-tech-watch" >
+                                  Public Sector Tech Watch
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/eugovtech" >
+                                  GovTech
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/digital-ready-policymaking" >
+                                  Digital Ready Policy Making
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/interoperability-architecture-solutions" >
+                                  Architecture solutions (CAMSS, TestBed, EIRA)
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/interoperability-regulatory-sandboxes" >
+                                  Regulatory sandboxes
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/discussions" >
+                                  Forum
+                                </a>
+                              </li>
+                                                      </ul>
+                                              </li>
+                                                                                <li >
+                                                <a href="/governance" >
+                          Governance
+                        </a>
+                                                  <ul>
+                                                          <li >
+                                                                <a href="/collection/governance-board" >
+                                  Board
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/community" >
+                                  Community
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/national-competent-authorities" >
+                                  National competent authorities
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/assessments" >
+                                  Assessments
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/eu-digital-funding-opportunities" >
+                                  Funding Opportunities
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/eu-digital-regulations" >
+                                  Landscape of EU digital regulations
+                                </a>
+                              </li>
+                                                      </ul>
+                                              </li>
+                                                                                <li >
+                                                <a href="/collection/interoperable-europe-academy/welcome" >
+                          Academy
+                        </a>
+                                                  <ul>
+                                                          <li >
+                                                                <a href="/collection/interoperable-europe-academy/learning-paths" >
+                                  Learning paths
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/interoperable-europe-academy/courses" >
+                                  Courses
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/interoperable-europe-academy/policy-briefs" >
+                                  Policy briefs
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="/collection/interoperable-europe-academy/curriculum" >
+                                  Curriculum
+                                </a>
+                              </li>
+                                                          <li >
+                                                                <a href="https://interoperable-europe.ec.europa.eu/collection/interoperable-europe-academy/event/interoperable-europe-seasonal-school-2026" >
+                                  Seasonal school 2026
+                                </a>
+                              </li>
+                                                      </ul>
+                                              </li>
+                                                                                <li >
+                                                <a href="/collection/semic-conference" >
+                          SEMIC 2026
+                        </a>
+                                              </li>
+                                                                                <li >
+                                                <a href="/eulogin?destination=/collection/eupl/eupl-text-eupl-12&amp;t=a9e1e6987901"  class="sign-in-link">
+                          Sign in
+                        </a>
+                                              </li>
+                                                                                                                      <li >
+                                                <a href="/collection/portal-support" >
+                          About us
+                        </a>
+                                              </li>
+                                                      </ul>
+              </div>
+            </li>
+                                                                                      
+                <li class="nav-item d-inline-block order-1">
+                                                          
+                    
+                    <a href="/modal/anonymous/bookmarks?destination=/user/bookmarks" title="Bookmarks" class="use-ajax nav-link nav-link--underline" data-dialog-type="modal" data-dialog-options="{&quot;width&quot;:&quot;auto&quot;,&quot;height&quot;:&quot;auto&quot;}"><svg
+   class="bi icon--s"
+><use xlink:href="/themes/ventuno/assets/icons/icons.svg#bookmark"/></svg></a>
+                    
+                                  </li>
+                                                                                                                                                                                            <li  class="order-2 dropdown-search nav-item dropdown">
+              <button
+                id="search-box-dropdown"
+                class="dropdown-toggle nav-link"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                type="button"
+                data-bs-auto-close="outside"
+                aria-label="Toggle search box"
+              >
+                <span class="visually-hidden">Toggle search box</span>
+                                  <svg class="bi icon--s">
+                    <use xlink:href="/themes/ventuno/assets/icons/icons.svg#search"></use>
+                  </svg>
+                              </button>
+              <div id="dropdown-menu--search"
+                class="dropdown-menu p-0"
+                aria-labelledby="search-box-dropdown"
+                data-popper-placement="right"
+              >
+                <div class="navbar-search p-2">
+                    <div class="views-exposed-form bef-exposed-form block block-views block-views-exposed-filter-blocksearch-page-1" data-bef-auto-submit="" data-bef-auto-submit-delay="500" data-bef-auto-submit-minimum-length="3" data-bef-auto-submit-full-form="" novalidate="novalidate" data-drupal-selector="views-exposed-form-search-page-1" id="block-exposedformsearchpage-header"><form data-joinup-block-id="exposedformsearchpage_header" action="/search" method="get" id="block-exposedformsearchpage-header" accept-charset="UTF-8">
+  
+<span class="search-badge" data-joinup-description="EUPL"><span class="search-badge__text">EUPL</span><span class="icon--close" aria-hidden="true"></span></span>
+  <label for="search-box" class="h4 visually-hidden form-label">Search</label>
+<div class="input-group js-form-item form-item js-form-type-search-api-autocomplete form-item-keys js-form-item-keys form-no-label mb-3">
+      
+<input placeholder="Start typing to search…" data-drupal-selector="edit-keys" data-search-api-autocomplete-search="search" class="form-autocomplete search-bar__input form-control" data-autocomplete-path="/search_api_autocomplete/search?display=page_1&amp;&amp;filter=keys" type="text" id="search-box" name="keys" value="" size="30" maxlength="128" />
+
+          <button type="submit" class="btn btn-search" aria-label="Trigger search sitewide"></button>
+</div>
+  
+<input class="search_bar_badge form-control" data-joinup-description="EUPL" data-drupal-selector="edit-filters" type="hidden" name="f[]" value="group:723254" />
+<div class="js-hide form-actions js-form-wrapper form-wrapper" data-drupal-selector="edit-actions" id="edit-actions">
+<input data-bef-auto-submit-click="" class="visually-hidden button js-form-submit form-submit btn-primary btn" data-drupal-selector="edit-submit-search" type="submit" id="edit-submit-search" value="Search site-wide" />
+</div>
+
+
+</form>
+</div>
+
+
+                </div>
+              </div>
+            </li>
+                                </ul>
+    </nav>
+  </div>
+</header>
+
+
+
+            <div class="region-header" role="complementary" aria-label="Header region">
+        <div class="region-header__inner">
+            <div id="block-ventuno-groupheader" class="block block-joinup-group block-group-header-block">
+
+<div class="group-banner bg-light pt-2 py-lg-2" role="region" aria-label="Collection header">
+  <div class="container py-0 py-md-2 d-flex flex-column flex-lg-row">
+    <div class="w-100 d-flex flex-column flex-lg-row flex-wrap">
+      <div class="group-banner__title my-2 my-lg-0 text-center text-lg-start d-flex align-items-center justify-content-center justify-content-lg-start">
+        
+                  <a class="h1 fw-bold mb-0" href="/collection/eupl">
+            
+<span>EUPL</span>
+
+          </a>
+                
+      </div>
+              <div class="group-banner__actions order-1 order-lg-0 d-flex flex-wrap justify-content-center align-items-start my-3 my-lg-0">
+          <div id="join_group_form_ajax_wrapper"><form class="join-group-form" data-drupal-selector="join-group-form" novalidate="novalidate" action="/collection/eupl/eupl-text-eupl-12" method="post" id="join-group-form" accept-charset="UTF-8">
+  <a href="/collection/eupl/authenticate-to-join" class="use-ajax btn btn-brand" data-dialog-type="modal" data-dialog-options="{&quot;width&quot;:&quot;auto&quot;}" data-drupal-selector="edit-authenticate" id="edit-authenticate">Join this collection</a>
+<input class="visually-hidden button js-form-submit form-submit btn-primary btn" data-drupal-selector="edit-rebuild" formnovalidate="formnovalidate" type="submit" id="edit-rebuild" name="join_group_form_base_rebuild" value="Rebuild" />
+  
+<input autocomplete="off" data-drupal-selector="form-qvnu8h4i2mw3m8bla0nmmmw-s3nmuuzrvjzn95yizkm" type="hidden" name="form_build_id" value="form-qVNu8H4i2MW3M8blA0nmMmw-s3nmUuzRvJZN95YiZKM" class="form-control" />
+  
+<input data-drupal-selector="edit-join-group-form" type="hidden" name="form_id" value="join_group_form" class="form-control" />
+
+</form>
+</div>
+        </div>
+                    <ul class="group-banner__meta mw-100 align-self-end list-unstyled d-flex flex-wrap mt-2 mb-0 group-stats fs-6">
+          <li class="group-banner__li text-muted">
+            <svg class="bi icon--xs me-1">
+              <use xlink:href="/themes/ventuno/assets/icons/icons.svg#clipboard2-check"></use>
+            </svg>
+            <a href="/collection/eupl/solutions">1 Solution</a>
+          </li>
+          <li class="group-banner__li text-muted">
+            <a href="/collection/eupl/members">
+              <svg class="bi icon--xs me-1">
+                <use xlink:href="/themes/ventuno/assets/icons/icons.svg#people"></use>
+              </svg>
+              <span>
+  120 members</span>
+
+            </a>
+          </li>
+                    <li class="group-banner__li group-banner__li--topics text-muted d-flex align-items-baseline w-100 mw-100">Topics: <div class="d-flex topics-wrapper pe-4 flex-lg-wrap">
+      <a href="/search?f%5B0%5D=topic%3A11225" class="badge bg-secondary rounded-pill" hreflang="en">European Policies</a>
+      <a href="/search?f%5B0%5D=topic%3A11188" class="badge bg-secondary rounded-pill" hreflang="en">Legal</a>
+      <a href="/search?f%5B0%5D=topic%3A11222" class="badge bg-secondary rounded-pill" hreflang="en">Licensing</a>
+      <a href="/topic/ict/open-source-software" class="badge bg-secondary rounded-pill" hreflang="en">Open Source Software</a>
+      <a href="/topic/ict/reusable-software-components" class="badge bg-secondary rounded-pill" hreflang="en">Reusable Software Components</a>
+  </div>
+</li>
+        </ul>
+          </div>
+  </div>
+</div>
+</div>
+<div id="block-ventuno-navigation" class="block block-joinup-group block-group-menu-blocknavigation">
+
+
+              
+<div class="menu--og--navigation bg-light">
+  <div class="container">
+    <nav aria-label="Secondary navigation">
+      <ul
+     class="nav"
+  ><li
+          class="nav-item"
+                  ><a href="/collection/eupl/welcome" class="nav-link" title="Welcome" data-drupal-link-system-path="node/726492">Welcome</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/documentation-repository" class="nav-link" title="Documentation Repository" data-drupal-link-system-path="node/726655">Documentation Repository</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/licensing-assistant" class="nav-link" title="Licensing Assistant" data-drupal-link-system-path="node/726691">Licensing Assistant</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/eupl-elearning-courses" class="nav-link" title="EUPL eLearning Courses" data-drupal-link-system-path="node/726632">EUPL eLearning Courses</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/discussions" class="nav-link" title="Discussions" data-drupal-link-system-path="node/723254/discussions">Discussions</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/news-events" class="nav-link" title="News &amp; Events" data-drupal-link-system-path="node/726649">News &amp; Events</a></li><li
+          class="nav-item"
+                  ><a href="/collection/eupl/faqs" class="nav-link" title="FAQs" data-drupal-link-system-path="node/726596">FAQs</a></li></ul>
+    </nav>
+  </div>
+</div>
+</div>
+
+
+        </div>
+      </div>
+      
+  <div class="content container">
+                  <div class="region-featured" role="complementary" aria-label="Featured region">
+            
+
+        </div>
+          
+                    <div data-sitewide-alert aria-live="polite" id="block-ventuno-site-wide-alerts" class="block block-sitewide-alert-block"><div data-joinup-block-id="ventuno_site_wide_alerts"></div>
+</div>
+<div data-drupal-messages-fallback class="hidden"></div>
+
+
+          
+                  <div class="region-content-top float-lg-end position-relative d-flex col-gap-2 my-3 ms-lg-3" role="complementary" aria-label="Content top region">
+            <div id="block-ventuno-bookmark" class="block block-joinup-flag block-joinup-flag-block">
+
+<a href="/modal/anonymous/bookmark?destination=/collection/eupl/eupl-text-eupl-12" data-dialog-type="modal" data-dialog-options="{&quot;width&quot;:&quot;auto&quot;,&quot;height&quot;:&quot;auto&quot;}" title="Add this page to bookmarks" class="use-ajax flag flag-bookmark btn btn-blue">
+  <svg
+   class="bi icon--s"
+><use xlink:href="/themes/ventuno/assets/icons/icons.svg#bookmark"/></svg>
+  Bookmark
+</a>
+</div>
+<div id="block-ventuno-like" class="zi-2 block block-joinup-flag block-joinup-flag-block">
+  
+<a class="flag flag-like use-ajax btn btn-secondary" href="/modal/anonymous/like?destination=/collection/eupl/eupl-text-eupl-12" data-dialog-type="modal" data-dialog-options="{&quot;width&quot;:&quot;auto&quot;,&quot;height&quot;:&quot;auto&quot;}">
+  <svg class="bi icon--fluid mb-1">
+    <use xlink:href="/themes/ventuno/assets/icons/icons.svg#hand-thumbs-up"></use>
+  </svg>
+  Like (1)
+</a>
+</div>
+
+
+        </div>
+          
+    <div class="mb-5">
+      <main id="main-content" aria-label="Main content region">
+                  <div class="layout-content">
+              <div id="block-ventuno-pagetitle" class="block block-core block-page-title-block">
+
+
+
+
+  <div class="page-title page__title-wrapper">
+    <h1 class="page-title__title mt-4">
+      <span>
+        
+<span>EUPL text (EUPL-1.2)</span>
+
+                  <a class="permalink" href="https://interoperable-europe.ec.europa.eu/node/143855" title="Permalink">
+            <svg
+   class="bi icon--m"
+><use xlink:href="/themes/ventuno/assets/icons/icons.svg#link-45deg"/></svg>
+          </a>
+              </span>
+    </h1>
+
+    <div class="page-title__details">
+          </div>
+  </div>
+
+</div>
+<div id="block-ventuno-content" class="block block-system block-system-main-block"><article class="node custom-page custom-page--full">
+      <div class="clearfix">
+          <div class="paragraph--simple-paragraph paragraph">
+            <p>Text of the European Union Public Licence (EUPL).<br><br>Version 1.2, published in Official Journal of 19 May 2017 and available in 23 official languages of the European Union (SPDX identifier EUPL-1.2).&nbsp; <a href="https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt">Developers' version</a></p><p>Recommended licensing terms:&nbsp; "copyright &lt;your name&gt;, &lt;date&gt;, licensed under the EUPL" (this targets the current EUPL version). Alternative: "Licensed under the EUPL-1.2-or-later" .</p><p>This page contains all the official versions of the European Union Public Licence (EUPL-1.2). <a href="https://interoperable-europe.ec.europa.eu/sites/default/files/custom-page/attachment/2025-09/eupl-preamble.pdf">The preamble</a> written for EUPL-1.0 in 2005, explaining the purpose of this Free/Open Source Software Licence, together with links to further information on the licence is valid for later versions.<br>&nbsp;</p><table><tbody><tr><td><strong>BG</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_bg.pdf" data-entity-type="file" data-entity-uuid="7219440a-d3e2-4720-8c96-6ebb2e1a2ccf" title="eupl_v1.2_bg.pdf">EUPL v1.2&nbsp;</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20BG.txt" data-entity-type="file" data-entity-uuid="32c7673c-2aa8-42bf-990d-b99217d5d036" title="EUPL v1_2 BG.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>CS</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_cs.pdf" data-entity-type="file" data-entity-uuid="fe4c201f-ea18-482e-8053-36779889cf7e" title="eupl_v1.2_cs.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20CS.txt" data-entity-type="file" data-entity-uuid="f21f202f-006c-4baa-b094-ac31c18a36ef" title="EUPL v1_2 CS.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>DA</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_da.pdf" data-entity-type="file" data-entity-uuid="ed099336-dfd2-40cd-9946-5342efda1e27" title="eupl_v1.2_da.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20DA.txt" data-entity-type="file" data-entity-uuid="8ce438f3-f50d-4ac6-b37b-76d66ce156ab" title="EUPL v1_2 DA.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>DE</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_de.pdf" data-entity-type="file" data-entity-uuid="122ffebf-7bda-4ace-9688-8a5952baae57" title="eupl_v1.2_de.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20DE.txt" data-entity-type="file" data-entity-uuid="75d83681-7645-4486-ba64-86fb87554974" title="EUPL v1_2 DE.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>ET</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_et.pdf" data-entity-type="file" data-entity-uuid="5ee53068-5fc7-4154-af33-7cc909cfacdb" title="eupl_v1.2_et.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20ET.txt" data-entity-type="file" data-entity-uuid="28713667-d169-46ad-994d-73585b23a532" title="EUPL v1_2 ET.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>EL</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_el.pdf" data-entity-type="file" data-entity-uuid="d86a5287-2c23-4c9c-bc60-4c053153a845" title="eupl_v1.2_el.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20EL.txt" data-entity-type="file" data-entity-uuid="2ef95f0f-4acf-4ba5-b060-099b245c7a9f" title="EUPL v1_2 EL.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>EN</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_en.pdf" data-entity-type="file" data-entity-uuid="641285b0-c155-47c1-a2ee-b86041a3cd0c" title="eupl_v1.2_en.pdf">EUPL v1.2</a></td><td><a href="https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt"><strong>TXT-80</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>ES</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_es.pdf" data-entity-type="file" data-entity-uuid="ee696457-483f-4d3a-8634-60ae58f45e7a" title="eupl_v1.2_es.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL v1_2 ES.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>FR</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_fr.pdf" data-entity-type="file" data-entity-uuid="b8fdd851-87d8-4ea2-8773-ee287c6701da" title="eupl_v1.2_fr.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20FR.txt" data-entity-type="file" data-entity-uuid="fea8bc4f-581b-4374-b32f-2bb8088f411d" title="EUPL v1_2 FR.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>IT</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_it.pdf" data-entity-type="file" data-entity-uuid="d5b14f71-98c2-4600-b668-16093db72e48" title="eupl_v1.2_it.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20IT.txt" data-entity-type="file" data-entity-uuid="969fa221-cfce-46a2-bb85-a956e043c991" title="EUPL v1_2 IT.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>LV</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_lv.pdf" data-entity-type="file" data-entity-uuid="28e9189b-b1ab-4837-b99a-61c7a7584adf" title="eupl_v1.2_lv.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20LV.txt" data-entity-type="file" data-entity-uuid="484ae053-bf36-42ba-b577-fa3897194261" title="EUPL v1_2 LV.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>LT</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_lt.pdf" data-entity-type="file" data-entity-uuid="37aff16d-242e-45e9-9a8e-40bbeb5154eb" title="eupl_v1.2_lt.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20LT.txt" data-entity-type="file" data-entity-uuid="690faed7-eaf0-49db-9b2f-ce5e986c1f45" title="EUPL v1_2 LT.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>HU</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_hu.pdf" data-entity-type="file" data-entity-uuid="ca7ed1b4-0ef7-4666-805c-91f8f5b8d474" title="eupl_v1.2_hu.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20HU.txt" data-entity-type="file" data-entity-uuid="c5bf9f9d-593b-4dd6-97e0-6e1f17112118" title="EUPL v1_2 HU.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>MT</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_mt.pdf" data-entity-type="file" data-entity-uuid="f98d5fc1-9bc8-4da4-9818-c72b3734840c" title="eupl_v1.2_mt.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20MT.txt" data-entity-type="file" data-entity-uuid="e6cd787c-abad-486a-a137-ba52b6aa75a4" title="EUPL v1_2 MT.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>NL&nbsp;</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_nl.pdf" data-entity-type="file" data-entity-uuid="99c10430-7219-408d-8635-ad5125d348ac" title="eupl_v1.2_nl.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20NL.txt" data-entity-type="file" data-entity-uuid="81dfe315-7e53-417a-828b-15b30cab04e8" title="EUPL v1_2 NL.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>PL</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_pl.pdf" data-entity-type="file" data-entity-uuid="e664d789-3cc3-4d1b-b066-878bce4aa842" title="eupl_v1.2_pl.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20PL.txt" data-entity-type="file" data-entity-uuid="d98e158f-c564-4c8c-9cdd-33c6f4669fef" title="EUPL v1_2 PL.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>PT</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_pt.pdf" data-entity-type="file" data-entity-uuid="f00f4002-2e5f-4d16-8370-df8a6d0c5f1c" title="eupl_v1.2_pt.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20PT.txt" data-entity-type="file" data-entity-uuid="128a3849-787e-48d2-9c94-8f47e62f5935" title="EUPL v1_2 PT.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>RO&nbsp;</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_ro.pdf" data-entity-type="file" data-entity-uuid="7f0da6a3-a94b-4233-aebb-311a9440e489" title="eupl_v1.2_ro.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20RO.txt" data-entity-type="file" data-entity-uuid="1d88dd5b-4bc0-4dfa-885e-a848adddb953" title="EUPL v1_2 RO.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>SK&nbsp;</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_sk.pdf" data-entity-type="file" data-entity-uuid="cd338e72-92e5-421f-8b2c-f8a4d640957d" title="eupl_v1.2_sk.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20SK.txt" data-entity-type="file" data-entity-uuid="7151f3f2-4b45-4d22-92af-e3c453809681" title="EUPL v1_2 SK.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>SL</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_sl.pdf" data-entity-type="file" data-entity-uuid="eb87ab6c-7ece-40f1-a49d-d83ea1530f83" title="eupl_v1.2_sl.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20SL.txt" data-entity-type="file" data-entity-uuid="7f40c0b8-d699-4136-9241-a2a29dbf3ab6" title="EUPL v1_2 SL.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>FI</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_fi.pdf" data-entity-type="file" data-entity-uuid="1d3437d0-c0b6-4fb8-b3fe-7f1c69b51b98" title="eupl_v1.2_fi.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20FI.txt" data-entity-type="file" data-entity-uuid="d39b0aab-f84f-4a44-ac81-ad149e29dfec" title="EUPL v1_2 FI.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>SV</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_sv.pdf" data-entity-type="file" data-entity-uuid="7ffb938a-fd86-4043-aeff-b4e4822a81c1" title="eupl_v1.2_sv.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20SV.txt" data-entity-type="file" data-entity-uuid="96d81607-2310-49ce-aaea-2c9d09e98600" title="EUPL v1_2 SV.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr><tr><td><strong>HR</strong></td><td><a href="/sites/default/files/custom-page/attachment/eupl_v1.2_hr.pdf" data-entity-type="file" data-entity-uuid="3d06ab74-7da5-40e3-a223-b145a1ec95f9" title="eupl_v1.2_hr.pdf">EUPL v1.2</a></td><td><a href="/sites/default/files/inline-files/EUPL%20v1_2%20HR.txt" data-entity-type="file" data-entity-uuid="7c067e9c-dfb6-4882-8ec3-b29a7f3db319" title="EUPL v1_2 HR.txt"><strong>TXT-UTF8</strong></a></td><td>&nbsp;</td></tr></tbody></table><p><strong>Further information:</strong></p><ul><li><a href="https://joinup.ec.europa.eu/page/introduction-eupl-licence">General information about the EUPL</a></li><li><a href="/collection/eupl/guidelines-users-and-developers" data-entity-type="node" data-entity-uuid="f4f8c3ef-5dd0-4296-887a-eea5d77ab924" title="Guidelines for users and developers">Guidelines for users and developers on "how to use the EUPL" (available in 22 languages)</a></li><li><a href="https://joinup.ec.europa.eu/page/eupl-compatible-open-source-licences" title="EUPL-compatible licenses">EUPL compatible open source licences</a></li><li><a href="https://joinup.ec.europa.eu/collection/eupl">The EUPL community</a></li><li><a href="http://ec.europa.eu/idabc/en/document/7330.html">EUPL v.1.0 (previous version)&nbsp;on the European Commission site</a></li><li><a href="http://ec.europa.eu/idabc/en/document/7778.html">List of the experts having participated to the legal quality verification of the various linguistic versions of the EUPL</a></li><li><a href="https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2017-11/Docda3d.pdf">Translation of the EUPL into the official languages of the European Union - Report on comments received by&nbsp;the European Commission </a></li><li><a href="https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2017-11/Doc3ef5.pdf">Study of the compatibility mechanism of the EUPL</a></li><li><a href="http://ec.europa.eu/idabc/en/document/5425.html">Preparations for the EUPL v.1.0</a></li><li><a href="http://ec.europa.eu/idabc/en/document/7311/5979.html">EUPL Workshop</a></li><li><a href="/collection/eupl/articles-documents" data-entity-type="node" data-entity-uuid="d037894f-6042-4fc8-8bf4-80eb53617250" title="Documentation directory">Articles on EUPL</a></li></ul>
+
+      </div>
+
+
+<div  class="abstract bg-light p-4 mt-3 mb-4">
+    <h3>Attachments</h3>
+      
+
+
+      <div class="fieldset-show-more">
+                    <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-bg_0.pdf" type="application/pdf" title="eupl1.1.-licence-bg_0.pdf">Previous EUPL-1.1 BG linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-cs_0.pdf" type="application/pdf" title="eupl1.1.-licence-cs_0.pdf">Previous EUPL-1.1 CS linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-da_0.pdf" type="application/pdf" title="eupl1.1.-licence-da_0.pdf">Previous EUPL-1.1 DA linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-de_0.pdf" type="application/pdf" title="eupl1.1.-licence-de_0.pdf">Previous EUPL-1.1 DE linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-el_0.pdf" type="application/pdf" title="eupl1.1.-licence-el_0.pdf">Previous EUPL-1.1 EL linguistic version</a></span>
+</div>
+  
+        <div class="collapse" id="extraItems">
+                <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-en_0.pdf" type="application/pdf" title="eupl1.1.-licence-en_0.pdf">Previous EUPL-1.1 EN  linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-es_0.pdf" type="application/pdf" title="eupl1.1.-licence-es_0.pdf">Previous EUPL-1.1 ES  linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-et_0.pdf" type="application/pdf" title="eupl1.1.-licence-et_0.pdf">Previous EUPL-1.1 ET  linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-fi_0.pdf" type="application/pdf" title="eupl1.1.-licence-fi_0.pdf">Previous EUPL-1.1 FI  linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-fr_0.pdf" type="application/pdf" title="eupl1.1.-licence-fr_0.pdf">Previous EUPL-1.1 FR  linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-hu_0.pdf" type="application/pdf" title="eupl1.1.-licence-hu_0.pdf">Previous EUPL-1.1 HU linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-it_0.pdf" type="application/pdf" title="eupl1.1.-licence-it_0.pdf">Previous EUPL-1.1 IT linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-lt_0.pdf" type="application/pdf" title="eupl1.1.-licence-lt_0.pdf">Previous EUPL-1.1 LT linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-lv_0.pdf" type="application/pdf" title="eupl1.1.-licence-lv_0.pdf">Previous EUPL-1.1 LV linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-mt_0.pdf" type="application/pdf" title="eupl1.1.-licence-mt_0.pdf">Previous EUPL-1.1 MT linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-nl_0.pdf" type="application/pdf" title="eupl1.1.-licence-nl_0.pdf">Previous EUPL-1.1 NL linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-pl_0.pdf" type="application/pdf" title="eupl1.1.-licence-pl_0.pdf">Previous EUPL-1.1 PL linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-pt_0.pdf" type="application/pdf" title="eupl1.1.-licence-pt_0.pdf">Previous EUPL-1.1 PT linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-ro_0.pdf" type="application/pdf" title="eupl1.1.-licence-ro_0.pdf">Previous EUPL-1.1 RO linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-sk_0.pdf" type="application/pdf" title="eupl1.1.-licence-sk_0.pdf">Previous EUPL-1.1 SK linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-sl_0.pdf" type="application/pdf" title="eupl1.1.-licence-sl_0.pdf">Previous EUPL-1.1 SL linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/eupl1.1.-licence-sv_0.pdf" type="application/pdf" title="eupl1.1.-licence-sv_0.pdf">Previous EUPL-1.1 SV linguistic version</a></span>
+</div>
+      <div class="fieldset__field-item"><span class="file file--mime-application-pdf file--application-pdf"><a href="/sites/default/files/custom-page/attachment/2025-09/eupl-preamble.pdf" type="application/pdf" title="eupl-preamble.pdf">EUPL original preamble</a></span>
+</div>
+  
+        </div>
+        <button class="btn btn-link px-0 fieldset-show-more__btn" type="button" data-bs-toggle="collapse" data-bs-target="#extraItems" aria-expanded="false" aria-controls="extraItems">
+          <span class="fieldset-show-more__btn-text">Show more</span>
+          <svg class="bi icon--s">
+            <use xlink:href="/themes/ventuno/assets/icons/icons.svg#chevron-down"></use>
+          </svg>
+        </button>
+          </div>
+  
+
+  </div>
+
+    </div>
+    <div class="d-flex flex-wrap align-items-end flex-row justify-content-end my-3">
+      
+  <a class="action-link btn btn-link px-3" href="/contact?category=report&amp;uri=/collection/eupl/eupl-text-eupl-12&amp;destination=collection/eupl/eupl-text-eupl-12">Report abusive content</a>
+
+      
+    </div>
+  </article>
+</div>
+<div id="block-ventuno-table-of-contents" class="block block-custom-page block-custom-page-tocnavigation">
+
+
+  
+<div class="menu--og--navigation bg-light">
+  <div class="container">
+    <nav aria-label="Secondary navigation">
+      <ul
+     class="nav"
+  ><li
+          class="nav-item"
+                  ><a href="/collection/eupl/eupl-text-eupl-12" class="nav-link is-active" title="EUPL text (EUPL-1.2)" data-drupal-link-system-path="node/143855" aria-current="page">EUPL text (EUPL-1.2)</a></li></ul>
+    </nav>
+  </div>
+</div>
+</div>
+<div data-joinup-block-id="toc_outline" id="block-ventuno-toc-outline" class="navigation-bottom block block-custom-page block-toc-outline"><ul class="toc-outline__links"><li class="prev"><a href="/collection/eupl/faqs">FAQs</a></li><li class="up"><a href="/collection/eupl/faqs">Up</a></li></ul></div>
+
+
+          </div>
+              </main>
+    </div>
+  </div>
+
+      
+<footer role="contentinfo" class="page__footer">
+  <div class="container text-light">
+    <div class="row py-4 py-lg-5">
+      <!--Interoperable Europe logo-->
+      <div class="col-md-12 col-lg-3 column-logo">
+        <p class="joinup-logo"><a href="/" class="joinup-logo-white mb-3"><span class="visually-hidden">Interoperable Europe</span></a></p>
+        <p class="joinup-version"><a href="https://gitlab.dhs.tech.ec.europa.eu/ec-europa/digit-joinup-reference/-/releases/2.14.3" aria-label="Interoperable Europe Portal version number: 2.14.3">2.14.3</a></p>
+      </div>
+      <h2 class="visually-hidden">Useful links</h2>
+
+        <div id="block-aboutus" class="block block-system block-system-menu-blockfooter-about-us col-md-3 col-lg-2 about-us-menu">
+  
+      <h3>About us</h3>
+    
+      
+              <ul data-joinup-block-id="aboutus" class="list-unstyled">
+                  <li class="nav-link">
+          <a href="/collection/portal-support" data-drupal-link-system-path="node/723169">Interoperable Europe Portal</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/eupl/solution/licensing-assistant/find-and-compare-software-licenses" data-drupal-link-system-path="node/701805">Licensing Assistant</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/iopeu-monitoring/eif-solutions-finder" data-drupal-link-system-path="node/705372">EIF Solutions Finder</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/interoperable-europe" data-drupal-link-system-path="node/723208">Interoperable Europe</a>
+                  </li>
+          </ul>
+  
+
+
+  </div>
+<div id="block-helpandsupport" class="block block-system block-system-menu-blockfooter-help-and-support col-md-3 col-lg-2 help-and-support-menu">
+  
+      <h3>Help and support</h3>
+    
+      
+              <ul data-joinup-block-id="helpandsupport" class="list-unstyled">
+                  <li class="nav-link">
+          <a href="" data-drupal-tour-link class="js-tour-start-button">Take a tour</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/portal-support/portals-user-reference-guide" data-drupal-link-system-path="node/726351">User Reference Guide</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/portal-support/faq" data-drupal-link-system-path="node/701545">Frequently Asked Questions (FAQ)</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/portal-support/how-articles" data-drupal-link-system-path="node/701543">How-To Articles</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/contact?destination=/collection/eupl/eupl-text-eupl-12" data-drupal-link-system-path="contact">Contact Portal Support</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/contribution-rules" data-drupal-link-system-path="node/726334">Contribution rules</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/portal-support/federation" data-drupal-link-system-path="node/702492">Federation</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/joinup/legal-notice" data-drupal-link-system-path="legal/document/legal_notice">Legal notice</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/collection/portal-support/specific-privacy-statement" data-drupal-link-system-path="node/704896">Privacy statement</a>
+                  </li>
+              <li class="nav-link">
+          <a href="/accessibility-statement-en" data-drupal-link-system-path="node/707335">Accessibility statement</a>
+                  </li>
+          </ul>
+  
+
+
+  </div>
+<div id="block-europeancommission" class="block block-system block-system-menu-blockfooter-european-commission col-md-3 col-lg-3 european-commission-menu">
+  
+      <h3>European Commission</h3>
+    
+      
+              <ul data-joinup-block-id="europeancommission" class="list-unstyled">
+                  <li class="nav-link">
+          <a href="https://commission.europa.eu/about-european-commissions-web-presence_en">About the Commission&#039;s new web presence</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://ec.europa.eu/info/resources-partners_en">Resources for partners</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://ec.europa.eu/info/cookies_en">Cookies</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://commission.europa.eu/about-european-commission/contact_en">Contact European Commission</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://ec.europa.eu/info/europa-analytics_en">Europa Analytics</a>
+                  </li>
+          </ul>
+  
+
+
+  </div>
+
+
+      <div class="col-md-3 col-lg-2 column-follow-us">
+        <div id="block-followus" class="block block-system block-system-menu-blockfooter-follow-us follow-us-menu">
+  
+      <h3>Follow us</h3>
+    
+      
+              <ul data-joinup-block-id="followus" class="list-unstyled">
+                  <li class="nav-link">
+          <a href="http://ec.europa.eu/newsroom/informatics/subscription-quick-generic-form-fullpage.cfm?service_id=1115">Newsletter subscription</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://ec.europa.eu/newsroom/informatics/newsletter-archives/view/service/1115">Newsletter archive</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://x.com/InteroperableEU">Twitter / X</a>
+                  </li>
+              <li class="nav-link">
+          <a href="https://www.linkedin.com/groups/12907049/">LinkedIn</a>
+                  </li>
+          </ul>
+  
+
+
+  </div>
+
+        
+        
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+  
+</div>
+
+  </div>
+
+    <script type="application/json">{"utility":"piwik","siteID":"183","sitePath":["interoperable-europe.ec.europa.eu"],"siteSection":"http:\/\/data.europa.eu\/w21\/b4be085f-c669-4ead-82a9-b2020fabd40b","instance":"ec.europa.eu"}</script>
+<script type="application/json">{"utility":"cck","url":"https:\/\/ec.europa.eu\/info\/cookies_{lang}"}</script>
+
+    <script type="application/json" data-drupal-selector="drupal-settings-json">{"path":{"baseUrl":"\/","pathPrefix":"","currentPath":"node\/143855","currentPathIsAdmin":false,"isFront":false,"currentLanguage":"en"},"pluralDelimiter":"\u0003","suppressDeprecationErrors":true,"ajaxPageState":{"libraries":"eJxtUVF24yAMvBCEI_GEUWxagSgSTXP7Yidrsrv54TGjQUgzAVWxefypLBj9NdGA4qAre-khJzXhvWTFgg3ILNzQpTK4AnT5-OrY7pcrt2w-OJVevSC0ZXNr415tgLiiYfSBWUUbVK8bZnRhoXe06J0O_Q2DMpO42HodH_3BVjI0JYaIzVRosI7H2ymbzKWX2gMl2TCaykSnZNwtpfIp5jGqh5r87sDCuRLqmOI9byQp3lJED4RNhwvDLuElAfmMMYE_2rr_qcuxnZG7KGYXQNAo9-b2w3xj0V7YQdidWPQkHuZNJBPsI3EZQE4q9kppAUWbor2mH5ydrwkpCqqVjW82jwRnaQTwqhxBzpZHhn-jkWgpLw8I7tznyBlLt5ZXawt8pxU0cZnFvXqiIQjQ_oH2Yf0r--xiA6tyPisVVrSalPCFeoZ_MgqBcO5zpPALDrYv_w","theme":"ventuno","theme_token":null},"ajaxTrustedUrl":{"\/search":true,"form_action_p_pvdeGsVG5zNF_XLGPTvYSKCf43t8qZYSwcfZl2uzM":true,"\/collection\/eupl\/eupl-text-eupl-12?ajax_form=1":true},"tourShepherdConfig":{"defaultStepOptions":{"classes":"drupal-tour","cancelIcon":{"enabled":true,"label":"Close"},"modalOverlayOpeningPadding":3,"scrollTo":{"behavior":"smooth","block":"center"},"popperOptions":{"modifiers":[{"name":"offset","options":{"offset":[-10,20]}},{"name":"arrow","options":{"padding":12}},{"name":"focusAfterRender","enabled":false}]}},"useModalOverlay":true},"_tour_internal":[{"id":"collection_content","selector":".collection__collection-settings article.tile","type":"text","counter":"1 of 5","attachTo":{"element":".collection__collection-settings article.tile","on":"left-start"},"classes":"tip-type-text tip-collection-content","body":"\u003Cp class=\u0022tour-tip-body\u0022\u003EThe content area displays items that have been created or shared within a collection. This is the default view when entering a collection.\u003C\/p\u003E\n","title":"Collection content"},{"id":"solution_content","selector":".solution__solution-settings article.tile","type":"text","counter":"2 of 5","attachTo":{"element":".solution__solution-settings article.tile","on":"left-start"},"classes":"tip-type-text tip-solution-content","body":"\u003Cp class=\u0022tour-tip-body\u0022\u003EThe content area displays items that have been created or shared within a solution. This is the default view when entering a solution.\u003C\/p\u003E\n","title":"Solution content"},{"id":"filters","selector":".tabs--content-type .nav-tabs a","type":"text","counter":"3 of 5","attachTo":{"element":".tabs--content-type .nav-tabs a","on":"bottom-start"},"classes":"tip-type-text tip-filters","body":"\u003Cp class=\u0022tour-tip-body\u0022\u003EBy clicking on these icons, you can view specific content types in the content area.\u003C\/p\u003E\n","title":"Filter"},{"id":"join","selector":".join-group-form input.button","type":"text","counter":"4 of 5","attachTo":{"element":".join-group-form input.button","on":"right-start"},"classes":"tip-type-text tip-join","body":"\u003Cp class=\u0022tour-tip-body\u0022\u003EBy joining a collection you become a member, with the ability to create content for it.\u003C\/p\u003E\n","title":"Join"},{"id":"search","selector":".dropdown-search","type":"text","counter":"5 of 5","attachTo":{"element":".dropdown-search","on":"left-start"},"classes":"tip-type-text tip-search","body":"\u003Cp class=\u0022tour-tip-body\u0022\u003ESearch through the entire Interoperable Europe Portal platform and its supported content items.\u003C\/p\u003E\n","title":"Search","cancelText":"End tour"}],"theme":"ventuno","bcl_icon_path":"\/themes\/ventuno\/assets\/icons\/icons.svg","field_group":{"html_element":{"mode":"default","context":"view","settings":{"classes":"","id":"","element":"div","show_label":true,"label_element":"h3","attributes":"","effect":"none","speed":"fast"}}},"sitewideAlert":{"refreshInterval":0,"automaticRefresh":false,"showCount":false,"serverSideRender":false},"better_exposed_filters":{"autosubmit_exclude_textfield":true},"search_api_autocomplete":{"search":{"auto_submit":true}},"ajax":{"edit-rebuild":{"callback":"::rebuild","event":"mousedown","keypress":true,"prevent":"click","url":"\/collection\/eupl\/eupl-text-eupl-12?ajax_form=1","httpMethod":"POST","dialogType":"ajax","submit":{"_triggering_element_name":"join_group_form_base_rebuild","_triggering_element_value":"Rebuild"}}},"user":{"uid":0,"permissionsHash":"254d34bbae1d4eed58da3bcb8f008cf178e703fe732272d1ef4776c6a14f6804"}}</script>
+<script src="/core/assets/vendor/jquery/jquery.min.js?v=4.0.0"></script>
+<script src="/sites/default/files/js/js_Cs6Q7QhsbWmU8zVwoljn7Ugg4zHFZ0JWi6Efax4As60.js?scope=footer&amp;delta=1&amp;language=en&amp;theme=ventuno&amp;include=eJx1UNGOwyAM-yEon4RCSWkmSrgQut7fH920bifdPYBkOw42AVVRPB6VG0a_UB6wOejKvvWwkZrw90jCggLZzCzoqAyuQJ5uXx3le1pYNnNjKr36hiDz6pJwrzZATGgY_R2DMufmovQ6jC9s2waimSGimKfVQyV_Jpp5qxkV3T-8aaR4p4geMoqOVCO-chd3XmbHor2wO8e5DNCmW7vY2GumGRQtRbvQgW_DQphjQ7Vt5bvdRuFP46PYhVZKax5HLZUd8mPX6f50bFi6tZysLbBTAiUub_FULzQGAryTVBBIAnW9GME2yjTa0SqEjL8eev5T4MMuPPdT-gHLBMNG"></script>
+<script src="/modules/contrib/tour/js/tour.js?v=11.3.13"></script>
+<script src="/sites/default/files/js/js_KHbCsDsaHncOR0zXwif_ZFsnuQaxv0QrdZ1VY2QQNp0.js?scope=footer&amp;delta=3&amp;language=en&amp;theme=ventuno&amp;include=eJx1UNGOwyAM-yEon4RCSWkmSrgQut7fH920bifdPYBkOw42AVVRPB6VG0a_UB6wOejKvvWwkZrw90jCggLZzCzoqAyuQJ5uXx3le1pYNnNjKr36hiDz6pJwrzZATGgY_R2DMufmovQ6jC9s2waimSGimKfVQyV_Jpp5qxkV3T-8aaR4p4geMoqOVCO-chd3XmbHor2wO8e5DNCmW7vY2GumGRQtRbvQgW_DQphjQ7Vt5bvdRuFP46PYhVZKax5HLZUd8mPX6f50bFi6tZysLbBTAiUub_FULzQGAryTVBBIAnW9GME2yjTa0SqEjL8eev5T4MMuPPdT-gHLBMNG"></script>
+
+  </body>
+</html>
