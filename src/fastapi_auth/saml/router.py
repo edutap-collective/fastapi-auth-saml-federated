@@ -10,23 +10,12 @@ from typing import TYPE_CHECKING, Annotated
 from fastapi import APIRouter, Form, Response
 from fastapi.responses import RedirectResponse
 
+from fastapi_auth.saml.redirect import is_safe_redirect
+
 if TYPE_CHECKING:
     from fastapi_auth.saml.sp import SamlSP
 
 _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
-
-
-def _safe_local_path(value: str) -> str:
-    r"""Return value only if it is a safe same-origin local path, else '/'.
-
-    Rejects protocol-relative ("//host") and backslash-variant ("/\\host")
-    values, which browsers resolve to an absolute cross-origin URL.
-    Blocks open-redirect vectors such as absolute URLs (``https://evil.com``).
-    Cross-host allowlisting is deferred to Plan 3 — this is only the local-path guard.
-    """
-    if value.startswith("/") and not value.startswith(("//", "/\\")):
-        return value
-    return "/"
 
 
 def build_router(sp: SamlSP) -> APIRouter:
@@ -35,7 +24,7 @@ def build_router(sp: SamlSP) -> APIRouter:
 
     @router.get("/login")
     async def login(next: str = "/") -> RedirectResponse:
-        safe_next = _safe_local_path(next)
+        safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
         request_id, location = await sp.engine.create_authn_request(relay_state=safe_next)
         await sp.store.add_outstanding(request_id, safe_next)
         return RedirectResponse(location, status_code=303)
@@ -49,7 +38,7 @@ def build_router(sp: SamlSP) -> APIRouter:
         identity = await sp.engine.parse_response(SAMLResponse, outstanding)
         for request_id in outstanding:
             await sp.store.pop_outstanding(request_id)
-        target = _safe_local_path(RelayState or "/")
+        target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)
         response = RedirectResponse(target, status_code=303)
         await sp.backend.establish(identity, response)
         return response
