@@ -39,7 +39,7 @@ class CookieBackend:
             response: The response object to set the cookie on.
         """
         sid = secrets.token_urlsafe(32)
-        await self._store.save_session(sid, identity)
+        await self._store.save_session(sid, identity, self._settings.session_ttl)
         response.set_cookie(
             self._settings.session_cookie_name,
             self._serializer.dumps(sid),

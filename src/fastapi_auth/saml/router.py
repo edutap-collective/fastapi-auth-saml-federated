@@ -6,7 +6,6 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 from __future__ import annotations
 
 import logging
-import time
 from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Response
@@ -32,7 +31,7 @@ def build_router(sp: SamlSP) -> APIRouter:
     async def login(next: str = "/") -> RedirectResponse:
         safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
         request_id, location = await sp.engine.create_authn_request(relay_state=safe_next)
-        await sp.store.add_outstanding(request_id, safe_next, time.monotonic())
+        await sp.store.add_outstanding(request_id, safe_next, sp.settings.outstanding_ttl)
         return RedirectResponse(location, status_code=303)
 
     @router.post("/acs")
@@ -40,7 +39,6 @@ def build_router(sp: SamlSP) -> APIRouter:
         SAMLResponse: Annotated[str, Form()],
         RelayState: Annotated[str, Form()] = "/",
     ) -> RedirectResponse:
-        await sp.store.purge_expired(sp.settings.outstanding_ttl, time.monotonic())
         outstanding = await sp.store.outstanding()
         try:
             identity, in_response_to = await sp.engine.parse_response(SAMLResponse, outstanding)
