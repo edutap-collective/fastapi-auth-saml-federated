@@ -1,0 +1,48 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install ${{ matrix.python }}
+      - run: uv pip install --system -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: ty check src tests
+      - run: pytest -m "not integration"
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 2s --health-timeout 3s --health-retries 20
+      postgres:
+        image: postgres:17-alpine
+        env: { POSTGRES_PASSWORD: pw, POSTGRES_DB: fa }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
+      - uses: astral-sh/setup-uv@v5
+      - run: uv pip install --system -e ".[dev,postgres]"
+      - run: pytest -m integration
+        env:
+          IT_REDIS_URL: redis://localhost:6379/0
+          IT_DB_URL: postgresql+asyncpg://postgres:pw@localhost:5432/fa
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t fa-saml:ci .
