@@ -36,5 +36,5 @@ def test_mdq_fetches_and_validates_signed_idp(tmp_path, certs, signed_idp_metada
     )
     engine = SamlEngine(s)
     # A successful create_authn_request proves the IdP metadata was fetched+validated via MDQ.
-    reqid, location = engine._prepare("/app")  # sync helper; MDQ fetch happens on demand
+    reqid, location = engine._prepare("/app", idp_eid)  # sync helper; MDQ fetch happens on demand
     assert location.startswith("https://idp")  # IdP SSO location from fetched metadata

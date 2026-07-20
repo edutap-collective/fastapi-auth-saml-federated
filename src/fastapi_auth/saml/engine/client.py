@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Any
 
 import anyio.to_thread
+from pydantic import BaseModel
 from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.config import SPConfig
@@ -24,6 +25,13 @@ from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.settings import SamlSettings
 
 logger = logging.getLogger("fastapi_auth.saml")
+
+
+class IdPChoice(BaseModel):
+    """One identity provider offered to the user on a WAYF/discovery page."""
+
+    entity_id: str
+    display_name: str
 
 
 def _extract_authn_instant(authn_info: list[Any]) -> datetime | None:
@@ -79,13 +87,21 @@ class SamlEngine:
         self._config = SPConfig().load(build_sp_config(settings))
         self._client = Saml2Client(config=self._config)
 
-    async def create_authn_request(self, relay_state: str) -> tuple[str, str]:
-        """Build a signed AuthnRequest; return (request_id, redirect URL)."""
-        return await anyio.to_thread.run_sync(self._prepare, relay_state)
+    async def create_authn_request(
+        self, relay_state: str, idp_entity_id: str | None = None
+    ) -> tuple[str, str]:
+        """Build a signed AuthnRequest; return (request_id, redirect URL).
 
-    def _prepare(self, relay_state: str) -> tuple[str, str]:
+        ``idp_entity_id`` selects the target IdP for federation discovery
+        (embedded/external WAYF); it defaults to ``settings.fixed_idp_entity_id``
+        for the single-IdP passthrough case.
+        """
+        resolved_idp = idp_entity_id or self._settings.fixed_idp_entity_id
+        return await anyio.to_thread.run_sync(self._prepare, relay_state, resolved_idp)
+
+    def _prepare(self, relay_state: str, idp_entity_id: str) -> tuple[str, str]:
         reqid, info = self._client.prepare_for_authenticate(
-            entityid=self._settings.fixed_idp_entity_id,
+            entityid=idp_entity_id,
             relay_state=relay_state,
             binding=BINDING_HTTP_REDIRECT,
             sign=self._settings.authn_requests_signed,
@@ -117,3 +133,34 @@ class SamlEngine:
     def sp_metadata(self) -> str:
         """Return this SP's metadata XML."""
         return create_metadata_string(None, config=self._config, sign=False).decode()
+
+    def list_idps(self, langpref: str | None = None) -> list[IdPChoice]:
+        """Enumerate the IdPs known from the configured federation metadata.
+
+        Used to render a WAYF ("Where Are You From") discovery page for
+        ``discovery_mode="embedded"``. One :class:`IdPChoice` per entity found
+        by pysaml2's ``identity_providers()``, with a human-readable
+        ``display_name`` resolved defensively (see :meth:`_idp_display_name`).
+        """
+        mds = self._client.config.metadata  # pysaml2 untyped: saml2.mdstore.MetadataStore
+        return [
+            IdPChoice(entity_id=entity_id, display_name=self._idp_display_name(entity_id, langpref))
+            for entity_id in mds.identity_providers()
+        ]
+
+    def _idp_display_name(self, entity_id: str, langpref: str | None) -> str:
+        """Best-effort human-readable name for an IdP entity ID.
+
+        Preference order: MDUI ``UIInfo/DisplayName`` (localized, first match),
+        then the organization display name, then the entity ID itself. Both
+        pysaml2 lookups are defensive: MDUI values may be empty/None for
+        entities that publish no such metadata.
+        """
+        mds = self._client.config.metadata  # pysaml2 untyped: saml2.mdstore.MetadataStore
+        mdui_names = [name for name in mds.mdui_uiinfo_display_name(entity_id, langpref) if name]
+        if mdui_names:
+            return str(mdui_names[0])
+        org_name = mds.name(entity_id, langpref or "en")
+        if org_name:
+            return str(org_name)
+        return entity_id
