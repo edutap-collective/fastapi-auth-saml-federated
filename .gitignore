@@ -211,3 +211,6 @@ uv.lock
 
 # test-time generated SAML keys/certs — never commit
 tests/certs/
+
+# local docker-compose port overrides
+compose.override.yml
