@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+.superpowers
+docs/_build
+dist
+build
+tests/certs
