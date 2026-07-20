@@ -1,5 +1,7 @@
 """Tests for the public Store.aclose() on all three implementations."""
 
+from unittest.mock import AsyncMock, patch
+
 import fakeredis.aioredis
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -14,8 +16,13 @@ async def test_memory_store_aclose_is_a_noop():
 
 
 async def test_redis_store_aclose_closes_the_client():
-    store = RedisStore(fakeredis.aioredis.FakeRedis())
+    client = fakeredis.aioredis.FakeRedis()
+    # Spy on the client's aclose method using AsyncMock.
+    client.aclose = AsyncMock(wraps=client.aclose)
+    store = RedisStore(client)
     await store.aclose()
+    # Verify the underlying client.aclose was actually invoked.
+    client.aclose.assert_awaited_once()
 
 
 async def test_postgres_store_aclose_disposes_the_engine():
@@ -23,7 +30,13 @@ async def test_postgres_store_aclose_disposes_the_engine():
     store = PostgresStore(engine)
     await store.create_all()
 
-    await store.aclose()
+    # Spy on the engine's dispose method at the class level using patch.
+    with patch(
+        "sqlalchemy.ext.asyncio.AsyncEngine.dispose", new_callable=AsyncMock
+    ) as mock_dispose:
+        await store.aclose()
+        # Verify the underlying engine.dispose was actually invoked.
+        mock_dispose.assert_awaited_once()
 
     # The engine's pool is disposed; a fresh engine still works fine, proving
     # aclose() didn't corrupt anything beyond the disposed engine itself.
