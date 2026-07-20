@@ -105,3 +105,33 @@ deployment shape:
 
 See {doc}`docker` for running a real Redis/Postgres locally to exercise the
 `redis`/`postgres` stores against.
+
+## Cleanup / lifespan
+
+The `redis` and `postgres` stores hold open connections (a Redis client, an async
+SQLAlchemy engine) that should be released on application shutdown. Call
+`await sp.aclose()` from a FastAPI `lifespan` handler -- it delegates to the
+configured store's own `aclose()`:
+
+```python
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from fastapi_auth import saml
+
+sp = saml.SamlSP(saml.SamlSettings(...))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await sp.aclose()  # release Redis/Postgres connections
+
+
+app = FastAPI(lifespan=lifespan)
+sp.mount(app)
+```
+
+The `memory` store's `aclose()` is a no-op, so calling it unconditionally is safe
+regardless of which store is configured.

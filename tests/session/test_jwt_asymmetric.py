@@ -3,6 +3,10 @@
 SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 """
 
+import base64
+import hashlib
+import hmac
+import json
 from pathlib import Path
 from typing import Any, cast
 
@@ -149,6 +153,48 @@ async def test_load_rejects_tampered_token(rsa_keys: tuple[str, str]) -> None:
     tampered_payload = payload[:mid] + flipped + payload[mid + 1 :]
     tampered = f"{header}.{tampered_payload}.{signature}"
     req = _request([(b"authorization", f"Bearer {tampered}".encode())])
+
+    assert await backend.load(req) is None
+
+
+def _b64url(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+
+
+async def test_load_rejects_hs256_alg_confusion_forgery(rsa_keys: tuple[str, str]) -> None:
+    """Classic alg-confusion forgery: sign a token with HS256, using the RSA
+    *public* key's PEM bytes -- which are not secret, an attacker who only ever
+    sees ``jwt_public_key_file`` has them too -- as the HMAC secret.
+
+    If ``load()`` ever verified against more than the single configured
+    ``jwt_alg`` (e.g. ``algorithms=["RS256", "HS256"]``), a verifier that reuses
+    the RS256 public key as an HS256 secret would accept this forged token as
+    genuine. Pinning verification to ``algorithms=[jwt_alg]`` (RS256 only, here)
+    is what closes this: the header's declared ``alg`` (HS256) is not in the
+    allowed set, so PyJWT rejects the token before any signature check runs.
+
+    Minted out-of-band (bytes assembled by hand, not via ``jwt.encode``) because
+    PyJWT itself refuses to *encode* an HS256 token using a PEM-formatted key as
+    of the version pinned here -- a defense-in-depth guard, not something this
+    backend can rely on across PyJWT versions/configurations, hence the
+    explicit ``algorithms=[jwt_alg]`` pin in ``JWTBackend.load()``.
+    """
+    priv, pub = rsa_keys
+    backend = JWTBackend(_settings("RS256", priv, pub))
+    public_key_pem = Path(pub).read_bytes()
+
+    header = _b64url(json.dumps({"alg": "HS256", "typ": "JWT"}, separators=(",", ":")).encode())
+    payload = _b64url(
+        json.dumps(
+            {"sub": "attacker", "attrs": {"eppn": "attacker@evil.example"}},
+            separators=(",", ":"),
+        ).encode()
+    )
+    signing_input = f"{header}.{payload}".encode()
+    signature = hmac.new(public_key_pem, signing_input, hashlib.sha256).digest()
+    forged = f"{header}.{payload}.{_b64url(signature)}"
+
+    req = _request([(b"authorization", f"Bearer {forged}".encode())])
 
     assert await backend.load(req) is None
 

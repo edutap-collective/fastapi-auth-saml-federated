@@ -46,7 +46,9 @@ sp = saml.SamlSP(
         session_secret="change-me-to-a-long-random-value",
     )
 )
-app.include_router(sp.router, prefix="/saml")
+sp.mount(app)
+# equivalent to: app.include_router(sp.router, prefix=sp.settings.mount_path)
+# -- only use include_router() directly if prefix matches settings.mount_path exactly.
 
 current_user = sp.current_user()
 
