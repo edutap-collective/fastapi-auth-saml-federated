@@ -240,9 +240,10 @@ def test_mdq_fetches_and_validates_signed_idp(tmp_path, certs, signed_idp_metada
 
 - [ ] **Step 2: `signed_idp_metadata` fixture** — in `tests/conftest.py`: erzeugt IdP-Metadaten (`create_metadata_string(..., sign=True, ...)` mit `certs["idp_key"]`/`certs["idp_crt"]`) für `IDP_EID` mit SSO-Endpoint `https://idp.../sso`. Trust-Anchor = `certs["idp_crt"]` (self-signed = Signer). Rückgabe als str.
 
-> Verifikation nötig: `create_metadata_string`-Signatur-Parameter (`sign=True`, `keyfile`/`cert`).
-> Falls die Signatur-API abweicht, korrekt anpassen; das Ziel: eine gegen `certs["idp_crt"]` verifizierbare Metadate.
-> Der MDQ-Fetch (`requests.get`) darf im Test synchron laufen (kein Event-Loop nötig für `_prepare`).
+> **Verifiziert (Spike):** `create_metadata_string(None, config=idp_cfg, sign=True, keyfile=certs["idp_key"], cert=certs["idp_crt"])`
+> gibt bei `sign=True` einen **`str`** zurück (ohne Sign: `bytes`) → `md = _m.decode() if isinstance(_m, bytes) else _m`.
+> Trust-Anchor = `certs["idp_crt"]` (self-signed = Signer). MDQ-URL = `{mdq_url}/entities/{{sha1}}<hexdigest>`,
+> `responses` mockt den GET. `_prepare` löst den MDQ-Fetch (`requests.get`) synchron aus — im Test kein Event-Loop nötig.
 
 - [ ] **Step 3: Rot → Grün** (Engine lädt via MDQ). **Step 4: lint** (belegen). **Step 5: Commit** — `test(engine): MDQ-Quelle end-to-end via responses-Mock (signierte Entity)`.
 
@@ -345,10 +346,20 @@ def test_parse_ds_return_reads_entity_id():
 - `engine/logout.py`: `SamlEngine.create_logout_redirect(identity) -> str | None` — baut aus `identity.idp_entity_id` + `identity.name_id`/`name_id_format` einen **LogoutRequest** an den SLO-Endpoint des IdP (aus Metadaten; HTTP-Redirect-Binding), signiert; gibt Redirect-URL zurück oder `None`, wenn der IdP kein SLO anbietet oder `name_id` fehlt. `handle_logout_response(saml_response, binding) -> bool` (best-effort).
 - Router: `GET /saml/slo` → lokale Session **immer** invalidieren (`backend.revoke`); wenn `create_logout_redirect` eine URL liefert → dorthin redirecten, sonst zu `next`/`/`. `GET/POST /saml/slo/return` → `handle_logout_response` (best-effort), Redirect zu `/`.
 
-> **pysaml2-Verifikation (Task-lokal):** Der genaue Weg, einen LogoutRequest ohne den
-> `client.users`-Cache zu bauen, an pysaml2 7.5.4 prüfen (`create_logout_request(destination,
-> issuer_entity_id, name_id, ...)` bzw. `do_logout` mit explizitem `entity_ids`/`name_id`).
-> Falls `global_logout` zwingend den users-Cache braucht: vor dem Logout `client.users.add_information_about_person(session_info)` mit den gespeicherten Daten füttern ODER `create_logout_request` direkt nutzen. Der Test muss den erzeugten LogoutRequest gegen einen In-Memory-IdP prüfen.
+> **Verifiziert (Spike) — kein users-Cache nötig:** `do_logout` nimmt `entity_ids` explizit:
+> ```python
+> name_id = NameID(format=identity.name_id_format or NAMEID_FORMAT_PERSISTENT, text=identity.name_id)
+> res = self._client.do_logout(name_id, [identity.idp_entity_id], reason="", expire=None,
+>                              sign=self._settings.authn_requests_signed, expected_binding=BINDING_HTTP_REDIRECT)
+> binding, http_args = res[identity.idp_entity_id]        # res: {entity_id: (binding, http_args)}
+> location = dict(http_args["headers"])["Location"]        # Redirect-URL mit SAMLRequest
+> ```
+> **Voraussetzungen (verifiziert):** (a) die **SP-Config braucht einen `single_logout_service`-Endpoint**
+> (`("{base_url}/saml/slo/return", BINDING_HTTP_REDIRECT)` in `build_sp_config` ergänzen); (b) die **IdP-Metadaten
+> müssen einen `SingleLogoutService` haben** — in Föderations-Metadaten real vorhanden, im In-Memory-IdP-Fixture
+> ergänzen (`"single_logout_service":[(SLO, BINDING_HTTP_REDIRECT)]`). Fehlt (a) oder (b) bzw. `identity.name_id`,
+> liefert `create_logout_redirect` `None` (best-effort → nur lokale Invalidierung). `create_logout_request` (entity.py)
+> ist die Low-Level-Alternative, aber `do_logout` mit explizitem `entity_ids` ist der bestätigte Weg.
 
 - [ ] **Step 1: Failing test** — `tests/test_slo.py`: (a) nach Login (In-Memory-IdP mit SLO-Endpoint in Metadaten) liefert `create_logout_redirect(identity)` eine Redirect-URL zum IdP-SLO mit `SAMLRequest`; (b) `GET /saml/slo` invalidiert die Session **immer** (auch wenn der IdP kein SLO anbietet → Redirect zu `/`, Session weg).
 
