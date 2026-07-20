@@ -20,6 +20,7 @@ from saml2.metadata import create_metadata_string
 
 from fastapi_auth.saml.engine.config import build_sp_config
 from fastapi_auth.saml.engine.errors import SamlResponseError
+from fastapi_auth.saml.engine.logout import build_logout_redirect, parse_logout_response
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.settings import SamlSettings
@@ -129,6 +130,29 @@ class SamlEngine:
             raise SamlResponseError("SAML response could not be parsed")
         in_response_to = resp.in_response_to or ""  # pysaml2 untyped
         return to_identity(resp), in_response_to
+
+    async def create_logout_redirect(self, identity: FederatedIdentity) -> str | None:
+        """Best-effort: build a signed LogoutRequest redirect URL for ``identity``'s IdP.
+
+        Returns ``None`` (never raises) if ``identity.name_id`` is missing, the
+        IdP advertises no Single Logout Service, or pysaml2 fails to build the
+        request for any other reason -- SLO is best-effort, local logout must
+        never depend on it.
+        """
+        return await anyio.to_thread.run_sync(
+            build_logout_redirect, self._client, self._settings, identity
+        )
+
+    async def handle_logout_response(
+        self, saml_response: str, binding: str = BINDING_HTTP_REDIRECT
+    ) -> bool:
+        """Best-effort: parse a LogoutResponse the IdP sent back after SLO.
+
+        Returns whether the response parsed; never raises.
+        """
+        return await anyio.to_thread.run_sync(
+            parse_logout_response, self._client, saml_response, binding
+        )
 
     def sp_metadata(self) -> str:
         """Return this SP's metadata XML."""

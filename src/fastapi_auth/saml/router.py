@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
+from saml2 import BINDING_HTTP_REDIRECT
 
 from fastapi_auth.saml.discovery.embedded import render_wayf
 from fastapi_auth.saml.discovery.external import ds_redirect_url, parse_ds_return
@@ -101,5 +102,33 @@ def build_router(sp: SamlSP) -> APIRouter:
     @router.get("/metadata")
     async def metadata() -> Response:
         return Response(sp.engine.sp_metadata(), media_type=_METADATA_MEDIA_TYPE)
+
+    @router.get("/slo")
+    async def slo(request: Request, next: str = "/") -> Response:
+        safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
+        identity = await sp.backend.load(request)
+
+        target = safe_next
+        if identity is not None:
+            redirect_url = await sp.engine.create_logout_redirect(identity)
+            if redirect_url is not None:
+                target = redirect_url
+
+        # The local session is ALWAYS invalidated, on the same response object
+        # that is returned -- SLO towards the IdP is best-effort and must never
+        # block or fail the local logout.
+        response = RedirectResponse(target, status_code=303)
+        await sp.backend.revoke(request, response)
+        return response
+
+    @router.get("/slo/return")
+    async def slo_return(request: Request) -> RedirectResponse:
+        saml_response = request.query_params.get("SAMLResponse")
+        if saml_response is not None:
+            try:
+                await sp.engine.handle_logout_response(saml_response, BINDING_HTTP_REDIRECT)
+            except Exception:  # pragma: no cover - handle_logout_response never raises
+                logger.warning("Unexpected error handling SLO LogoutResponse", exc_info=True)
+        return RedirectResponse("/", status_code=303)
 
     return router

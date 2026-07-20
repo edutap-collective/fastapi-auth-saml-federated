@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
-from saml2 import BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
 
 from fastapi_auth.saml.engine.entity_categories import resolve_entity_categories
 from fastapi_auth.saml.settings import SamlSettings
@@ -64,9 +64,11 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
     The ``metadata`` block is dispatched per ``settings.metadata_source`` by
     :func:`build_metadata_config`.
     """
+    slo_url = f"{settings.base_url.rstrip('/')}/saml/slo/return"
     sp: dict[str, Any] = {
         "endpoints": {
             "assertion_consumer_service": [(settings.acs_url, BINDING_HTTP_POST)],
+            "single_logout_service": [(slo_url, BINDING_HTTP_REDIRECT)],
         },
         "allow_unsolicited": False,
         "authn_requests_signed": settings.authn_requests_signed,

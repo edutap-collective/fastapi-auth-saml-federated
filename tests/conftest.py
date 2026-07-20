@@ -17,6 +17,7 @@ SP_EID = "urn:test:sp"
 IDP_EID = "urn:test:idp"
 ACS = "https://sp.example/saml/acs"
 SSO = "https://idp.example/sso"
+SLO = "https://idp.example/slo"
 
 # Resolved once from PATH so tests don't depend on a hardcoded (e.g. Homebrew-only)
 # install location; tests that need them are skipped if not found.
@@ -72,7 +73,12 @@ def idp_metadata_file(tmp_path, certs):
         {
             "entityid": IDP_EID,
             "service": {
-                "idp": {"endpoints": {"single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)]}}
+                "idp": {
+                    "endpoints": {
+                        "single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)],
+                        "single_logout_service": [(SLO, BINDING_HTTP_REDIRECT)],
+                    }
+                }
             },
             "key_file": certs["idp_key"],
             "cert_file": certs["idp_crt"],
@@ -156,7 +162,12 @@ def make_idp(certs):
             "entityid": IDP_EID,
             "xmlsec_binary": _XMLSEC1_BIN,
             "service": {
-                "idp": {"endpoints": {"single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)]}}
+                "idp": {
+                    "endpoints": {
+                        "single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)],
+                        "single_logout_service": [(SLO, BINDING_HTTP_REDIRECT)],
+                    }
+                }
             },
             "key_file": certs["idp_key"],
             "cert_file": certs["idp_crt"],
