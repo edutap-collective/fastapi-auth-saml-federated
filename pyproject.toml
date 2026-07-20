@@ -33,7 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 redis = ["redis>=5"]
-postgres = ["sqlmodel>=0.0.22", "asyncpg>=0.29"]
+postgres = ["sqlmodel>=0.0.22", "asyncpg>=0.29", "greenlet"]
 dev = [
     "pytest>=8",
     "pytest-asyncio>=0.23",
