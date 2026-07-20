@@ -76,7 +76,8 @@ ignore = ["D203", "D213"]
 convention = "pep257"
 
 [tool.pytest.ini_options]
-addopts = "-ra"
+addopts = "-ra -m 'not integration'"
+markers = ["integration: needs live redis/postgres (make test-integration)"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]

@@ -16,4 +16,7 @@ test-local:
 	uv run pytest
 
 test-integration:
-	@echo "Integrationstests kommen in Meilenstein 5 (SimpleSAMLphp-Compose)."
+	docker compose up -d --wait
+	IT_REDIS_URL=redis://localhost:6399/0 \
+	IT_DB_URL=postgresql+asyncpg://postgres:pw@localhost:5439/fa \
+	uv run pytest -m integration -v; status=$$?; docker compose down -v; exit $$status
