@@ -46,3 +46,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t fa-saml:ci .
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv pip install --system -e ".[docs]"
+      - run: uv run sphinx-build -W -b html docs docs/_build

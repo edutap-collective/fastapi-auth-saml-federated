@@ -97,11 +97,11 @@ settings = saml.SamlSettings(
 Backend and store are chosen independently — pick the combination for your
 deployment shape:
 
-| Deployment                                  | `backend` | `store`                                               |
-| ------------------------------------------- | --------- | ------------------------------------------------------ |
-| Single-process dev server                   | `cookie`  | `memory`                                                |
-| Multi-worker / horizontally scaled service   | `cookie`  | `redis` or `postgres`                                   |
-| Stateless service, no shared session store   | `jwt`     | `redis` or `postgres` (for outstanding requests only)    |
+| Deployment | `backend` | `store` |
+| --- | --- | --- |
+| Single-process dev server | `cookie` | `memory` |
+| Multi-worker / horizontally scaled service | `cookie` | `redis` or `postgres` |
+| Stateless service, no shared session store | `jwt` | `redis` or `postgres` (for outstanding requests only) |
 
 See {doc}`docker` for running a real Redis/Postgres locally to exercise the
 `redis`/`postgres` stores against.

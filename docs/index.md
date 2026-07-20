@@ -68,6 +68,27 @@ no active session; `sp.optional_user()` returns the same identity or `None` inst
 raising. Both depend on the endpoint prefix matching `settings.mount_path` (default
 `/saml`) — see {doc}`howto/stores` for how the session itself is carried and stored.
 
+## Migration notes
+
+`SAML_ACS_PATH` was removed. The assertion-consumer-service path is now derived
+from `mount_path` (`SAML_MOUNT_PATH`, default `/saml`) as `{mount_path}/acs`;
+`acs_path` is a read-only property, not a settable field, so a leftover
+`SAML_ACS_PATH` environment variable is silently ignored rather than raising
+an error. The discovery (`/disco`), SLO (`/slo`, `/slo/return`), and embedded-WAYF
+login (`{mount_path}/login`) paths derive from `mount_path` the same way.
+
+Because of this derivation, `sp.mount(app)` is the recommended way to attach
+the router, instead of `app.include_router(sp.router, prefix="/saml")`:
+
+```python
+sp.mount(app)
+```
+
+`mount()` always includes the router at `settings.mount_path`, so the prefix
+and `mount_path` can never diverge -- calling `include_router()` directly with
+a hand-written `prefix=` risks mounting the router somewhere that no longer
+matches the paths `acs_url`, `absolute_url()`, and `wayf_login_path` compute.
+
 ## How-to guides
 
 ```{toctree}
