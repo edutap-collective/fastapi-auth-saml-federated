@@ -7,6 +7,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN uv pip install --system --no-cache ".[redis,postgres]"
+RUN rm -f /usr/local/bin/uv
 
 FROM python:3.13-slim AS runtime
 ENV PYTHONUNBUFFERED=1
@@ -17,7 +18,6 @@ RUN apt-get update \
 COPY --from=build /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin
 WORKDIR /app
-COPY src ./src
 # Smoke check baked in: import + xmlsec1 present
 RUN python -c "import fastapi_auth.saml; import shutil; assert shutil.which('xmlsec1'), 'xmlsec1 missing'"
 CMD ["python", "-c", "import fastapi_auth.saml as s; print('fastapi-auth-saml-federated', s.__version__)"]
