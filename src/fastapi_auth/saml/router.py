@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from fastapi_auth.saml.sp import SamlSP
 
 _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
-_WAYF_LOGIN_PATH = "/saml/login"
 
 logger = logging.getLogger("fastapi_auth.saml")
 
@@ -54,16 +53,14 @@ def build_router(sp: SamlSP) -> APIRouter:
             if ds_url is None:  # pragma: no cover - settings validator guarantees this
                 msg = "discovery_mode='external' requires ds_url"
                 raise HTTPException(status_code=500, detail=msg)
-            return_url = (
-                f"{sp.settings.base_url.rstrip('/')}/saml/disco?{urlencode({'next': safe_next})}"
-            )
+            return_url = f"{sp.settings.absolute_url('/disco')}?{urlencode({'next': safe_next})}"
             return RedirectResponse(
                 ds_redirect_url(ds_url, sp.settings.entity_id, return_url), status_code=303
             )
 
         if sp.settings.discovery_mode == "embedded":
             idps = sp.engine.list_idps(sp.settings.metadata_langpref)
-            html = render_wayf(idps, _WAYF_LOGIN_PATH, safe_next, sp._jinja)
+            html = render_wayf(idps, sp.settings.wayf_login_path, safe_next, sp._jinja)
             return Response(html, media_type="text/html")
 
         # passthrough: fixed IdP, straight to AuthnRequest.

@@ -64,7 +64,7 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
     The ``metadata`` block is dispatched per ``settings.metadata_source`` by
     :func:`build_metadata_config`.
     """
-    slo_url = f"{settings.base_url.rstrip('/')}/saml/slo/return"
+    slo_url = settings.absolute_url("/slo/return")
     sp: dict[str, Any] = {
         "endpoints": {
             "assertion_consumer_service": [(settings.acs_url, BINDING_HTTP_POST)],

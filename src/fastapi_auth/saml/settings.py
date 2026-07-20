@@ -27,7 +27,7 @@ class SamlSettings(BaseSettings):
     # --- service provider ---
     entity_id: str
     base_url: str
-    acs_path: str = "/saml/acs"
+    mount_path: str = "/saml"
     key_file: str
     cert_file: str
 
@@ -92,9 +92,23 @@ class SamlSettings(BaseSettings):
     encryption_cert_file: str | None = None
 
     @property
+    def acs_path(self) -> str:
+        """Path (relative to the mount root) of the assertion-consumer-service endpoint."""
+        return f"{self.mount_path}/acs"
+
+    @property
     def acs_url(self) -> str:
         """Absolute assertion-consumer-service URL."""
         return f"{self.base_url.rstrip('/')}{self.acs_path}"
+
+    @property
+    def wayf_login_path(self) -> str:
+        """Path (relative to the mount root) of the embedded-discovery login endpoint."""
+        return f"{self.mount_path}/login"
+
+    def absolute_url(self, subpath: str) -> str:
+        """Build an absolute SP URL for ``subpath`` under ``mount_path`` (e.g. ``/disco``)."""
+        return f"{self.base_url.rstrip('/')}{self.mount_path}{subpath}"
 
     @property
     def enc_key_file(self) -> str:
