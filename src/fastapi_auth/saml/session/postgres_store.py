@@ -108,14 +108,25 @@ class PostgresStore:
             return {r.request_id: r.return_url for r in rows}
 
     async def pop_outstanding(self, request_id: str) -> str | None:
-        """Remove and return the return_url for an outstanding AuthnRequest, or None."""
+        """Atomically remove and return the return_url for an outstanding AuthnRequest.
+
+        Uses a single ``DELETE ... RETURNING`` statement so the row can't be
+        popped twice by concurrent callers racing on the same request_id.
+        """
         async with AsyncSession(self._engine) as s:
-            row = await s.get(SamlOutstanding, request_id)
+            stmt = (
+                delete(SamlOutstanding)  # ty: ignore[no-matching-overload]  # SQLModel field descriptors don't satisfy SQLAlchemy's returning() overloads, though they work fine at runtime
+                .where(
+                    SamlOutstanding.request_id == request_id  # ty: ignore[invalid-argument-type]  # SQLAlchemy instrumented-attribute comparison returns ColumnElement[bool], not bool
+                )
+                .returning(SamlOutstanding.return_url, SamlOutstanding.expires_at)
+            )
+            result = await s.execute(stmt)
+            row = result.first()
+            await s.commit()
             if row is None:
                 return None
-            url, expires_at = row.return_url, row.expires_at
-            await s.delete(row)
-            await s.commit()
+            url, expires_at = row
             return url if expires_at >= time.time() else None
 
     async def aclose(self) -> None:

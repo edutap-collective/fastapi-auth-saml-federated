@@ -68,12 +68,15 @@ class RedisStore:
         return result
 
     async def pop_outstanding(self, request_id: str) -> str | None:
-        """Remove and return the return_url for an outstanding AuthnRequest, or None."""
-        key = f"{self._op}{request_id}"
-        value = await self._r.get(key)
+        """Atomically remove and return the return_url for an outstanding AuthnRequest.
+
+        Uses GETDEL (Redis 6.2+) so the get-and-remove happens as a single
+        server-side operation, avoiding a race where two workers could both
+        observe the same outstanding request_id.
+        """
+        value = await self._r.getdel(f"{self._op}{request_id}")
         if value is None:
             return None
-        await self._r.delete(key)
         return value.decode() if isinstance(value, bytes) else value
 
     async def aclose(self) -> None:
