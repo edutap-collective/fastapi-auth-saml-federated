@@ -110,3 +110,30 @@ def test_jwt_backend_accepts_strong_secret():
     data = cast(dict[str, Any], {**_BASE, "backend": "jwt", "session_secret": "s" * 32})
     s = SamlSettings(**data)
     assert s.backend == "jwt"
+
+
+def test_metadata_source_defaults_direct():
+    assert SamlSettings(**_BASE).metadata_source == "direct"
+
+
+def test_mdq_requires_url():
+    with pytest.raises(ValidationError, match="mdq_url"):
+        SamlSettings(**cast(dict[str, Any], {**_BASE, "metadata_source": "mdq"}))
+
+
+def test_aggregate_requires_a_source():
+    with pytest.raises(ValidationError, match="aggregate"):
+        SamlSettings(**cast(dict[str, Any], {**_BASE, "metadata_source": "aggregate"}))
+
+
+def test_external_discovery_requires_ds_url():
+    with pytest.raises(ValidationError, match="ds_url"):
+        SamlSettings(**cast(dict[str, Any], {**_BASE, "discovery_mode": "external"}))
+
+
+def test_mdq_accepts_url():
+    data = cast(
+        dict[str, Any], {**_BASE, "metadata_source": "mdq", "mdq_url": "https://mdq.dfn.de"}
+    )
+    s = SamlSettings(**data)
+    assert s.mdq_url == "https://mdq.dfn.de"

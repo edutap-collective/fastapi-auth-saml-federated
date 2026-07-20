@@ -1,6 +1,7 @@
 """Configuration for the SAML2 service provider (pydantic-settings).
 
-Milestone 2 scope: single-IdP direct metadata + passthrough discovery only.
+Supports single-IdP direct metadata as well as federation metadata sources
+(aggregate, MDQ) and discovery modes (passthrough, external, embedded).
 
 SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 """
@@ -30,14 +31,20 @@ class SamlSettings(BaseSettings):
     key_file: str
     cert_file: str
 
-    # --- metadata / trust (this milestone: single-IdP direct only) ---
-    metadata_source: Literal["direct"] = "direct"
+    # --- metadata / trust ---
+    metadata_source: Literal["direct", "aggregate", "mdq"] = "direct"
     idp_metadata_file: str | None = None
     idp_metadata_url: str | None = None
+    aggregate_file: str | None = None
+    aggregate_url: str | None = None
+    mdq_url: str | None = None
+    trust_anchor_cert: str | None = None
 
-    # --- discovery (this milestone: passthrough only) ---
-    discovery_mode: Literal["passthrough"] = "passthrough"
+    # --- discovery ---
+    discovery_mode: Literal["passthrough", "external", "embedded"] = "passthrough"
     fixed_idp_entity_id: str
+    ds_url: str | None = None
+    metadata_langpref: str = "en"
 
     # --- session ---
     session_cookie_name: str = "fa_saml_session"
@@ -109,5 +116,19 @@ class SamlSettings(BaseSettings):
         """Validate that JWT backend has a strong enough secret."""
         if self.backend == "jwt" and len(self.jwt_signing_secret.encode()) < 32:
             msg = "JWT backend requires jwt_secret/session_secret of at least 32 bytes"
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _check_federation_config(self) -> SamlSettings:
+        """Validate that metadata-source and discovery-mode selections have required inputs."""
+        if self.metadata_source == "mdq" and not self.mdq_url:
+            msg = "metadata_source='mdq' requires mdq_url"
+            raise ValueError(msg)
+        if self.metadata_source == "aggregate" and not (self.aggregate_file or self.aggregate_url):
+            msg = "metadata_source='aggregate' requires aggregate_file or aggregate_url"
+            raise ValueError(msg)
+        if self.discovery_mode == "external" and not self.ds_url:
+            msg = "discovery_mode='external' requires ds_url"
             raise ValueError(msg)
         return self
