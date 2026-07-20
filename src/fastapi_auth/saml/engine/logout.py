@@ -35,10 +35,10 @@ def build_logout_redirect(
     """
     if not identity.name_id or not identity.idp_entity_id:
         return None
-    name_id = NameID(
-        format=identity.name_id_format or NAMEID_FORMAT_PERSISTENT, text=identity.name_id
-    )
     try:
+        name_id = NameID(
+            format=identity.name_id_format or NAMEID_FORMAT_PERSISTENT, text=identity.name_id
+        )
         # pysaml2 is untyped: do_logout() -> dict[entity_id, (binding, http_args)]
         # for entities it could build a request for; raises LogoutError if none.
         responses: Any = client.do_logout(

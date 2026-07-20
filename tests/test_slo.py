@@ -114,6 +114,28 @@ async def test_create_logout_redirect_none_without_idp_slo_endpoint(certs, tmp_p
     assert await engine.create_logout_redirect(identity) is None
 
 
+async def test_create_logout_redirect_never_raises_when_nameid_build_fails(
+    certs, idp_metadata_file, monkeypatch
+):
+    """The NameID construction is pysaml2-adjacent and must be covered by the
+    same best-effort guard as do_logout(): if it raises for any reason,
+    create_logout_redirect must swallow it and return None, never propagate.
+
+    This is the regression test for the hardening fix that moved the NameID
+    build inside the try/except in engine/logout.py -- it fails if that guard
+    is reverted (NameID construction moved back outside the try).
+    """
+    engine = SamlEngine(_settings(certs, idp_metadata_file))
+    identity = FederatedIdentity(idp_entity_id=IDP_EID, name_id="u123-persistent")
+
+    def _boom(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr("fastapi_auth.saml.engine.logout.NameID", _boom)
+
+    assert await engine.create_logout_redirect(identity) is None
+
+
 # --- (b) GET /saml/slo ALWAYS clears the local session ---
 
 
@@ -145,6 +167,30 @@ def test_slo_clears_session_and_redirects_home_without_idp_slo(certs, tmp_path, 
     slo = client.get("/saml/slo", follow_redirects=False)
     assert slo.status_code == 303
     assert slo.headers["location"] == "/"
+    assert sp.settings.session_cookie_name in slo.headers.get("set-cookie", "")
+
+    assert client.get("/me").status_code == 401
+
+
+def test_slo_clears_session_when_logout_redirect_build_raises(
+    certs, idp_metadata_file, make_idp, monkeypatch
+):
+    """End-to-end: even if building the IdP LogoutRequest blows up (here via a
+    failing NameID construction), GET /saml/slo must still invalidate the
+    local session -- local logout must never depend on the SLO round trip.
+    """
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+    assert client.get("/me").status_code == 200
+
+    def _boom(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr("fastapi_auth.saml.engine.logout.NameID", _boom)
+
+    slo = client.get("/saml/slo", follow_redirects=False)
+    assert slo.status_code == 303
     assert sp.settings.session_cookie_name in slo.headers.get("set-cookie", "")
 
     assert client.get("/me").status_code == 401
