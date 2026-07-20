@@ -7,8 +7,9 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from typing import Any
 
-from fastapi import HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from fastapi_auth.saml.engine.client import SamlEngine
@@ -63,6 +64,22 @@ class SamlSP:
         return select_identifier(
             identity, self.settings.identifier, self.settings.identifier_fallback
         )
+
+    def mount(self, app: FastAPI, **kwargs: Any) -> None:
+        """Include this SP's router on ``app`` under ``settings.mount_path``.
+
+        This is the recommended way to attach a SamlSP to a FastAPI app: it
+        guarantees the router's prefix and ``settings.mount_path`` -- which
+        every absolute SP URL (ACS, disco, WAYF login, ...) is derived from --
+        can never diverge. Calling ``app.include_router(sp.router, prefix=...)``
+        directly still works, but the given ``prefix`` must then match
+        ``settings.mount_path`` exactly, or the router will be reachable at a
+        different path than the one baked into those absolute URLs.
+
+        ``**kwargs`` are forwarded verbatim to ``app.include_router()`` (e.g.
+        ``dependencies=``, ``tags=``) for any callers that need them.
+        """
+        app.include_router(self.router, prefix=self.settings.mount_path, **kwargs)
 
     async def aclose(self) -> None:
         """Release the store's resources; call from a FastAPI lifespan shutdown."""
