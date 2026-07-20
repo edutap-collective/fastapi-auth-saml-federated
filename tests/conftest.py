@@ -118,6 +118,34 @@ def build_signed_aggregate(tmp_path: Path, certs: dict[str, str], entity_ids: li
 
 
 @pytest.fixture
+def signed_idp_metadata(certs):
+    """Return signed IdP metadata XML for ``IDP_EID``, signed with the IdP's own key.
+
+    The self-signed ``certs["idp_crt"]`` is both the signer and, in MDQ tests,
+    the configured trust anchor -- so a successful signature check here proves
+    the fetched document really came from (and was validated against) that
+    trust anchor.
+    """
+    if _XMLSEC1_BIN is None:
+        pytest.skip("xmlsec1 binary not found on PATH; required for pysaml2 signing")
+    idp_cfg = IdPConfig().load(
+        {
+            "entityid": IDP_EID,
+            "xmlsec_binary": _XMLSEC1_BIN,
+            "service": {
+                "idp": {"endpoints": {"single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)]}}
+            },
+            "key_file": certs["idp_key"],
+            "cert_file": certs["idp_crt"],
+        }
+    )
+    md = create_metadata_string(
+        None, config=idp_cfg, sign=True, keyfile=certs["idp_key"], cert=certs["idp_crt"]
+    )
+    return md.decode() if isinstance(md, bytes) else md
+
+
+@pytest.fixture
 def make_idp(certs):
     """Return a factory that builds an in-memory IdP Server bound to given SP metadata."""
     if _XMLSEC1_BIN is None:
