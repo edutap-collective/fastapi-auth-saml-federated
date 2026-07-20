@@ -1,11 +1,11 @@
 # Testing against the real LMU Shibboleth IdP (`lmuidp-container`)
 
-:::{warning}
+```{warning}
 **LMU-internal.** This how-to targets an LMU-internal test container; the
 GitLab repository and test credentials referenced below are not publicly
 accessible. If you are outside LMU, use {doc}`simplesamlphp` or {doc}`dfn-aai`
 instead.
-:::
+```
 
 For a high-fidelity check beyond a local SimpleSAMLphp IdP (see {doc}`simplesamlphp`),
 LMU maintains a containerized copy of its production Shibboleth IdP, pre-loaded with
