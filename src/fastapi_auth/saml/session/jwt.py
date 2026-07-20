@@ -26,10 +26,12 @@ class JWTBackend:
     token minted under one algorithm is rejected under another (closing
     alg-confusion attacks).
 
-    The token is signed, not encrypted: it carries the full identity
-    (``attrs``) in plaintext, readable by whoever holds it. For
-    attribute-rich identities this can approach the ~4 KB size limit typical
-    for browser cookies.
+    The token is signed, not encrypted: it carries the identity (``attrs``)
+    in plaintext, readable by whoever holds it. For attribute-rich identities
+    this can approach the ~4 KB size limit typical for browser cookies.
+    Setting ``jwt_attributes`` restricts ``attrs`` to a chosen subset of
+    ``FederatedIdentity`` fields (data minimisation, smaller cookies); by
+    default the full identity is carried, unchanged from prior behavior.
     """
 
     def __init__(self, settings: SamlSettings) -> None:
@@ -44,10 +46,15 @@ class JWTBackend:
         subject = select_identifier(
             identity, self._settings.identifier, self._settings.identifier_fallback
         )
+        dump = identity.model_dump(mode="json")
+        if self._settings.jwt_attributes is not None:
+            attrs = {k: dump[k] for k in self._settings.jwt_attributes if k in dump}
+        else:
+            attrs = dump
         payload = {
             "sub": subject or identity.name_id or "",
             "exp": int(time.time()) + self._settings.jwt_ttl,
-            "attrs": identity.model_dump(mode="json"),
+            "attrs": attrs,
         }
         token = jwt.encode(payload, self._signing_key, algorithm=self._settings.jwt_alg)
         response.set_cookie(

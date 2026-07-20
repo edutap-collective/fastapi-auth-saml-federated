@@ -70,6 +70,9 @@ class SamlSettings(BaseSettings):
     # public key can verify tokens without being able to mint them.
     jwt_private_key_file: str | None = None
     jwt_public_key_file: str | None = None
+    # Data-minimisation: when set, only these FederatedIdentity field names are
+    # carried in the token's "attrs" claim (smaller cookies, less PII in transit).
+    jwt_attributes: list[str] | None = None
 
     # --- crypto / security ---
     xmlsec_binary: str = Field(default_factory=_default_xmlsec)
