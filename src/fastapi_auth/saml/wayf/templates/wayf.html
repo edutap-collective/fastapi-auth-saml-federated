@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Select your organization</title>
+  </head>
+  <body>
+    <h1>Select your organization</h1>
+    <ul>
+      {% for idp in idps %}
+      <li><a href="{{ idp.href }}">{{ idp.display_name }}</a></li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
