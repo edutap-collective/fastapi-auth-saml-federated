@@ -20,9 +20,11 @@ class JWTBackend:
 
     The default ``jwt_alg`` (``HS256``) is a symmetric algorithm: anyone who can
     verify the token can also mint one. An asymmetric algorithm (e.g. RS256,
-    EdDSA) with a separate signing/verification key pair would be needed to
-    let other services verify tokens without being able to forge them; that is
-    not implemented here.
+    EdDSA) with a separate signing/verification key pair lets other services
+    verify tokens, read from file-based PEM keys, without being able to forge
+    them. Verification is pinned to the single configured ``jwt_alg``, so a
+    token minted under one algorithm is rejected under another (closing
+    alg-confusion attacks).
 
     The token is signed, not encrypted: it carries the full identity
     (``attrs``) in plaintext, readable by whoever holds it. For
@@ -31,8 +33,11 @@ class JWTBackend:
     """
 
     def __init__(self, settings: SamlSettings) -> None:
-        """Initialize the JWT backend with the given settings."""
+        """Initialize the JWT backend, resolving key material once from settings."""
         self._settings = settings
+        # Resolved and cached once so asymmetric key files aren't re-read per request.
+        self._signing_key = settings.jwt_signing_key
+        self._verifying_key = settings.jwt_verifying_key
 
     async def establish(self, identity: FederatedIdentity, response: Response) -> None:
         """Sign the identity into a JWT and set it as the session cookie."""
@@ -44,9 +49,7 @@ class JWTBackend:
             "exp": int(time.time()) + self._settings.jwt_ttl,
             "attrs": identity.model_dump(mode="json"),
         }
-        token = jwt.encode(
-            payload, self._settings.jwt_signing_secret, algorithm=self._settings.jwt_alg
-        )
+        token = jwt.encode(payload, self._signing_key, algorithm=self._settings.jwt_alg)
         response.set_cookie(
             self._settings.session_cookie_name,
             token,
@@ -62,9 +65,7 @@ class JWTBackend:
         if token is None:
             return None
         try:
-            payload = jwt.decode(
-                token, self._settings.jwt_signing_secret, algorithms=[self._settings.jwt_alg]
-            )
+            payload = jwt.decode(token, self._verifying_key, algorithms=[self._settings.jwt_alg])
         except jwt.InvalidTokenError:
             return None
         return FederatedIdentity.model_validate(payload.get("attrs", {}))

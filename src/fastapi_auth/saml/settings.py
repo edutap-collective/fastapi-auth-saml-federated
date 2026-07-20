@@ -9,6 +9,7 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -64,6 +65,11 @@ class SamlSettings(BaseSettings):
     jwt_alg: str = "HS256"
     jwt_ttl: int = 3600
     jwt_secret: str | None = None
+    # Asymmetric algorithms (RS256, EdDSA, ...) sign with a private key and
+    # verify with the corresponding public key, so parties that only hold the
+    # public key can verify tokens without being able to mint them.
+    jwt_private_key_file: str | None = None
+    jwt_public_key_file: str | None = None
 
     # --- crypto / security ---
     xmlsec_binary: str = Field(default_factory=_default_xmlsec)
@@ -125,11 +131,52 @@ class SamlSettings(BaseSettings):
         """Secret/key used to sign app JWTs (defaults to the session secret)."""
         return self.jwt_secret or self.session_secret
 
+    def jwt_is_symmetric(self) -> bool:
+        """Return whether ``jwt_alg`` is a symmetric (HMAC) algorithm."""
+        return self.jwt_alg.startswith("HS")
+
+    @property
+    def jwt_signing_key(self) -> str:
+        """Key used to sign app JWTs: the shared secret, or the PEM private key."""
+        if self.jwt_is_symmetric():
+            return self.jwt_signing_secret
+        if self.jwt_private_key_file is None:
+            # Unreachable when backend="jwt": _check_jwt_secret_strength enforces this.
+            msg = "jwt_private_key_file is required for an asymmetric jwt_alg"
+            raise ValueError(msg)
+        return Path(self.jwt_private_key_file).read_text()
+
+    @property
+    def jwt_verifying_key(self) -> str:
+        """Key used to verify app JWTs: the shared secret, or the PEM public key."""
+        if self.jwt_is_symmetric():
+            return self.jwt_signing_secret
+        if self.jwt_public_key_file is None:
+            # Unreachable when backend="jwt": _check_jwt_secret_strength enforces this.
+            msg = "jwt_public_key_file is required for an asymmetric jwt_alg"
+            raise ValueError(msg)
+        return Path(self.jwt_public_key_file).read_text()
+
     @model_validator(mode="after")
     def _check_jwt_secret_strength(self) -> SamlSettings:
-        """Validate that JWT backend has a strong enough secret."""
-        if self.backend == "jwt" and len(self.jwt_signing_secret.encode()) < 32:
-            msg = "JWT backend requires jwt_secret/session_secret of at least 32 bytes"
+        """Validate that the JWT backend has strong-enough key material.
+
+        Symmetric algorithms (HS*) need a shared secret of at least 32 bytes;
+        asymmetric algorithms (RS256, EdDSA, ...) need both a private and a
+        public key file. Files are only checked for presence here, never
+        read -- reading happens lazily via ``jwt_signing_key``/``jwt_verifying_key``.
+        """
+        if self.backend != "jwt":
+            return self
+        if self.jwt_is_symmetric():
+            if len(self.jwt_signing_secret.encode()) < 32:
+                msg = "JWT backend requires jwt_secret/session_secret of at least 32 bytes"
+                raise ValueError(msg)
+        elif not (self.jwt_private_key_file and self.jwt_public_key_file):
+            msg = (
+                "JWT backend with an asymmetric jwt_alg requires both "
+                "jwt_private_key_file and jwt_public_key_file"
+            )
             raise ValueError(msg)
         return self
 
