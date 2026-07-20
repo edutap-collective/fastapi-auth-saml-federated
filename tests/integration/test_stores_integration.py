@@ -26,10 +26,9 @@ async def test_redis_store_roundtrip_live():
         assert await store.outstanding() == {"r1": "/app"}
         assert await store.pop_outstanding("r1") == "/app"
     finally:
-        # RedisStore has no public close(); reach into the wrapped client to avoid
-        # leaking the connection into a ResourceWarning (promoted to an error by
-        # filterwarnings = ["error", ...] in pyproject.toml).
-        await store._r.aclose()  # noqa: SLF001
+        # Close explicitly to avoid leaking the connection into a ResourceWarning
+        # (promoted to an error by filterwarnings = ["error", ...] in pyproject.toml).
+        await store.aclose()
 
 
 async def test_postgres_store_roundtrip_live():
@@ -45,4 +44,4 @@ async def test_postgres_store_roundtrip_live():
     finally:
         # Same rationale as above: dispose the pooled asyncpg connections
         # explicitly instead of relying on GC (which trips filterwarnings=error).
-        await store._engine.dispose()  # noqa: SLF001
+        await store.aclose()

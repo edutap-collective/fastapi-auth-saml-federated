@@ -117,3 +117,7 @@ class PostgresStore:
             await s.delete(row)
             await s.commit()
             return url if expires_at >= time.time() else None
+
+    async def aclose(self) -> None:
+        """Dispose the wrapped engine, releasing its connection pool."""
+        await self._engine.dispose()

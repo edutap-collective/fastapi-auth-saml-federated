@@ -64,5 +64,9 @@ class SamlSP:
             identity, self.settings.identifier, self.settings.identifier_fallback
         )
 
+    async def aclose(self) -> None:
+        """Release the store's resources; call from a FastAPI lifespan shutdown."""
+        await self.store.aclose()
+
 
 __all__ = ["SamlSP"]

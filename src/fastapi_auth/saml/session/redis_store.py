@@ -75,3 +75,7 @@ class RedisStore:
             return None
         await self._r.delete(key)
         return value.decode() if isinstance(value, bytes) else value
+
+    async def aclose(self) -> None:
+        """Close the wrapped Redis client, releasing its connection pool."""
+        await self._r.aclose()

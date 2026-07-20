@@ -39,6 +39,10 @@ class Store(Protocol):
         """Remove and return the return_url for an outstanding AuthnRequest, or None."""
         ...
 
+    async def aclose(self) -> None:
+        """Release any resources held by the store (connections, pools, ...)."""
+        ...
+
 
 class MemoryStore:
     """Non-persistent Store (single process) with lazy TTL expiry."""
@@ -89,3 +93,6 @@ class MemoryStore:
             return None
         url, expires_at = item
         return url if self._clock() <= expires_at else None
+
+    async def aclose(self) -> None:
+        """No-op: MemoryStore holds no external resources to release."""
