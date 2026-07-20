@@ -133,7 +133,72 @@ def test_external_discovery_requires_ds_url():
 
 def test_mdq_accepts_url():
     data = cast(
-        dict[str, Any], {**_BASE, "metadata_source": "mdq", "mdq_url": "https://mdq.dfn.de"}
+        dict[str, Any],
+        {
+            **_BASE,
+            "metadata_source": "mdq",
+            "mdq_url": "https://mdq.dfn.de",
+            "trust_anchor_cert": "/tmp/anchor.pem",
+        },
     )
     s = SamlSettings(**data)
     assert s.mdq_url == "https://mdq.dfn.de"
+
+
+def test_mdq_requires_trust_anchor():
+    with pytest.raises(ValidationError, match="trust_anchor"):
+        SamlSettings(
+            **cast(
+                dict[str, Any],
+                {
+                    **_BASE,
+                    "metadata_source": "mdq",
+                    "mdq_url": "https://mdq.dfn.de",
+                    "trust_anchor_cert": None,
+                },
+            )
+        )
+
+
+def test_aggregate_url_requires_trust_anchor():
+    with pytest.raises(ValidationError, match="trust_anchor"):
+        SamlSettings(
+            **cast(
+                dict[str, Any],
+                {
+                    **_BASE,
+                    "metadata_source": "aggregate",
+                    "aggregate_url": "https://federation.example/metadata.xml",
+                    "trust_anchor_cert": None,
+                },
+            )
+        )
+
+
+def test_aggregate_file_needs_no_trust_anchor():
+    s = SamlSettings(
+        **cast(
+            dict[str, Any],
+            {
+                **_BASE,
+                "metadata_source": "aggregate",
+                "aggregate_file": "/tmp/agg.xml",
+            },
+        )
+    )
+    assert s.aggregate_file == "/tmp/agg.xml"
+
+
+def test_mdq_with_trust_anchor_ok():
+    s = SamlSettings(
+        **cast(
+            dict[str, Any],
+            {
+                **_BASE,
+                "metadata_source": "mdq",
+                "mdq_url": "https://mdq.dfn.de",
+                "trust_anchor_cert": "/tmp/anchor.pem",
+            },
+        )
+    )
+    assert s.trust_anchor_cert == "/tmp/anchor.pem"

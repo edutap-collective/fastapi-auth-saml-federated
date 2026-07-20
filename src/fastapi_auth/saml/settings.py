@@ -125,8 +125,18 @@ class SamlSettings(BaseSettings):
         if self.metadata_source == "mdq" and not self.mdq_url:
             msg = "metadata_source='mdq' requires mdq_url"
             raise ValueError(msg)
+        if self.metadata_source == "mdq" and not self.trust_anchor_cert:
+            msg = "metadata_source='mdq' requires trust_anchor_cert (metadata must be verified)"
+            raise ValueError(msg)
         if self.metadata_source == "aggregate" and not (self.aggregate_file or self.aggregate_url):
             msg = "metadata_source='aggregate' requires aggregate_file or aggregate_url"
+            raise ValueError(msg)
+        if (
+            self.metadata_source == "aggregate"
+            and self.aggregate_url
+            and not self.trust_anchor_cert
+        ):
+            msg = "metadata_source='aggregate' with aggregate_url requires trust_anchor_cert"
             raise ValueError(msg)
         if self.discovery_mode == "external" and not self.ds_url:
             msg = "discovery_mode='external' requires ds_url"
