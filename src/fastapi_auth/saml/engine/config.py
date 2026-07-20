@@ -32,6 +32,26 @@ def load_idp_metadata(settings: SamlSettings) -> str:
     raise ValueError(msg)
 
 
+def build_metadata_config(settings: SamlSettings) -> dict[str, Any]:
+    """Return the pysaml2 ``metadata`` dict for the configured metadata source.
+
+    - ``direct``: inline IdP metadata XML, loaded via :func:`load_idp_metadata`
+      (the original single-IdP behavior).
+    - ``aggregate`` with ``aggregate_file``: a local federation aggregate file.
+    - ``aggregate`` with ``aggregate_url``: a remote federation aggregate,
+      verified against ``trust_anchor_cert``.
+    - ``mdq``: a Metadata Query Protocol endpoint, verified against
+      ``trust_anchor_cert``.
+    """
+    if settings.metadata_source == "aggregate":
+        if settings.aggregate_file:
+            return {"local": [settings.aggregate_file]}
+        return {"remote": [{"url": settings.aggregate_url, "cert": settings.trust_anchor_cert}]}
+    if settings.metadata_source == "mdq":
+        return {"mdq": [{"url": settings.mdq_url, "cert": settings.trust_anchor_cert}]}
+    return {"inline": [load_idp_metadata(settings)]}
+
+
 def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
     """Assemble the pysaml2 SPConfig dict for this service provider.
 
@@ -41,9 +61,9 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
     produces the same config as before this profile support was added.
     The top level always carries ``encryption_keypairs`` (so the SP can
     decrypt EncryptedAssertions) and, if configured, ``entity_category``.
+    The ``metadata`` block is dispatched per ``settings.metadata_source`` by
+    :func:`build_metadata_config`.
     """
-    idp_metadata = load_idp_metadata(settings)
-
     sp: dict[str, Any] = {
         "endpoints": {
             "assertion_consumer_service": [(settings.acs_url, BINDING_HTTP_POST)],
@@ -78,7 +98,7 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
         "encryption_keypairs": [
             {"key_file": settings.enc_key_file, "cert_file": settings.enc_cert_file}
         ],
-        "metadata": {"inline": [idp_metadata]},
+        "metadata": build_metadata_config(settings),
     }
     if settings.entity_categories:
         config["entity_category"] = resolve_entity_categories(settings.entity_categories)

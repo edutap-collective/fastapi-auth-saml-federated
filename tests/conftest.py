@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2.config import IdPConfig
-from saml2.metadata import create_metadata_string
+from saml2.metadata import create_metadata_string, entities_descriptor, entity_descriptor
 from saml2.saml import NAMEID_FORMAT_PERSISTENT, NameID
 from saml2.server import Server
 
@@ -81,6 +81,39 @@ def idp_metadata_file(tmp_path, certs):
     md = create_metadata_string(None, config=idp_cfg, sign=False).decode()
     path = tmp_path / "idp-metadata.xml"
     path.write_text(md)
+    return str(path)
+
+
+def build_signed_aggregate(tmp_path: Path, certs: dict[str, str], entity_ids: list[str]) -> str:
+    """Build an ``<EntitiesDescriptor>`` aggregating one IdP per ``entity_ids``, written to a file.
+
+    Used to exercise the ``aggregate``/``local`` metadata source against a
+    realistic multi-IdP federation document. Each IdP gets a minimal
+    single-sign-on-service endpoint and the shared test IdP key/cert. The
+    aggregate is written unsigned: pysaml2's ``local`` metadata source does
+    not verify signatures, and this helper only needs to support IdP
+    enumeration via ``SPConfig().load(...).metadata.identity_providers()``.
+    """
+    entity_descriptors = []
+    for entity_id in entity_ids:
+        idp_cfg = IdPConfig().load(
+            {
+                "entityid": entity_id,
+                "service": {
+                    "idp": {"endpoints": {"single_sign_on_service": [(SSO, BINDING_HTTP_REDIRECT)]}}
+                },
+                "key_file": certs["idp_key"],
+                "cert_file": certs["idp_crt"],
+            }
+        )
+        entity_descriptors.append(entity_descriptor(idp_cfg))
+
+    entities, _xmldoc = entities_descriptor(
+        entity_descriptors, valid_for=0, name=None, ident=None, sign=False, secc=None
+    )
+    xml = entities.to_string({"xs": "http://www.w3.org/2001/XMLSchema"}).decode()
+    path = tmp_path / "aggregate.xml"
+    path.write_text(xml)
     return str(path)
 
 
