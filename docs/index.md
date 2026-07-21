@@ -99,6 +99,7 @@ matches the paths `acs_url`, `absolute_url()`, and `wayf_login_path` compute.
 
 howto/docker
 howto/stores
+howto/idp-initiated
 howto/simplesamlphp
 howto/lmuidp
 howto/dfn-aai
