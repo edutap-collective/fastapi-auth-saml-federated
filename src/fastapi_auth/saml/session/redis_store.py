@@ -19,11 +19,13 @@ class RedisStore:
         *,
         session_prefix: str = "fa:sess:",
         outstanding_prefix: str = "fa:out:",
+        seen_assertion_prefix: str = "fa:seen:",
     ) -> None:
         """Wrap an existing ``redis.asyncio.Redis``-compatible client."""
         self._r = client
         self._sp = session_prefix
         self._op = outstanding_prefix
+        self._ap = seen_assertion_prefix
 
     @classmethod
     def from_url(cls, url: str) -> RedisStore:
@@ -78,6 +80,20 @@ class RedisStore:
         if value is None:
             return None
         return value.decode() if isinstance(value, bytes) else value
+
+    async def seen_assertion(self, assertion_id: str, ttl: int) -> bool:
+        """Atomically check-and-record an assertion ID for replay detection.
+
+        Returns True if ``assertion_id`` was already seen within the ``ttl``
+        window (a replay). Otherwise records it for ``ttl`` seconds and
+        returns False.
+
+        Uses ``SET NX EX`` so the check-and-set is a single atomic Redis
+        operation: the key is only written if it doesn't already exist, and
+        the return value tells us which case happened.
+        """
+        was_set = await self._r.set(f"{self._ap}{assertion_id}", "1", nx=True, ex=ttl)
+        return not was_set
 
     async def aclose(self) -> None:
         """Close the wrapped Redis client, releasing its connection pool."""

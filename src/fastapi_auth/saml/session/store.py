@@ -39,6 +39,15 @@ class Store(Protocol):
         """Remove and return the return_url for an outstanding AuthnRequest, or None."""
         ...
 
+    async def seen_assertion(self, assertion_id: str, ttl: int) -> bool:
+        """Atomically check-and-record an assertion ID for replay detection.
+
+        Returns True if ``assertion_id`` was already seen within the ``ttl``
+        window (a replay). Otherwise records it for ``ttl`` seconds and
+        returns False.
+        """
+        ...
+
     async def aclose(self) -> None:
         """Release any resources held by the store (connections, pools, ...)."""
         ...
@@ -52,6 +61,7 @@ class MemoryStore:
         self._clock = clock
         self._sessions: dict[str, tuple[FederatedIdentity, float]] = {}
         self._outstanding: dict[str, tuple[str, float]] = {}
+        self._seen_assertions: dict[str, float] = {}
 
     async def save_session(self, sid: str, identity: FederatedIdentity, ttl: int) -> None:
         """Save a session with its associated identity, expiring after ``ttl`` seconds."""
@@ -93,6 +103,19 @@ class MemoryStore:
             return None
         url, expires_at = item
         return url if self._clock() <= expires_at else None
+
+    async def seen_assertion(self, assertion_id: str, ttl: int) -> bool:
+        """Atomically check-and-record an assertion ID for replay detection.
+
+        Returns True if ``assertion_id`` was already seen within the ``ttl``
+        window (a replay). Otherwise records it for ``ttl`` seconds and
+        returns False.
+        """
+        expires_at = self._seen_assertions.get(assertion_id)
+        if expires_at is not None and self._clock() <= expires_at:
+            return True
+        self._seen_assertions[assertion_id] = self._clock() + ttl
+        return False
 
     async def aclose(self) -> None:
         """No-op: MemoryStore holds no external resources to release."""

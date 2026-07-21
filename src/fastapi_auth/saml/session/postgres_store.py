@@ -9,6 +9,7 @@ import time
 from typing import Any
 
 from sqlalchemy import delete
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, SQLModel, select
 
@@ -28,6 +29,13 @@ class SamlOutstanding(SQLModel, table=True):
 
     request_id: str = Field(primary_key=True)
     return_url: str
+    expires_at: float
+
+
+class SamlSeenAssertion(SQLModel, table=True):
+    """SQLModel table recording consumed assertion IDs for replay detection."""
+
+    assertion_id: str = Field(primary_key=True)
     expires_at: float
 
 
@@ -128,6 +136,32 @@ class PostgresStore:
                 return None
             url, expires_at = row
             return url if expires_at >= time.time() else None
+
+    async def seen_assertion(self, assertion_id: str, ttl: int) -> bool:
+        """Atomically check-and-record an assertion ID for replay detection.
+
+        Returns True if ``assertion_id`` was already seen within the ``ttl``
+        window (a replay). Otherwise records it for ``ttl`` seconds and
+        returns False.
+
+        The primary-key insert *is* the atomic check-and-set: a duplicate
+        assertion ID raises ``IntegrityError``, which we treat as a replay.
+        """
+        now = time.time()
+        async with AsyncSession(self._engine) as s:
+            await s.execute(
+                delete(SamlSeenAssertion).where(
+                    SamlSeenAssertion.expires_at < now  # ty: ignore[invalid-argument-type]  # SQLAlchemy instrumented-attribute comparison returns ColumnElement[bool], not bool
+                )
+            )
+            await s.commit()
+            try:
+                s.add(SamlSeenAssertion(assertion_id=assertion_id, expires_at=now + ttl))
+                await s.commit()
+            except IntegrityError:
+                await s.rollback()
+                return True
+            return False
 
     async def aclose(self) -> None:
         """Dispose the wrapped engine, releasing its connection pool."""
