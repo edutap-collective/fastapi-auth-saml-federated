@@ -200,3 +200,67 @@ def test_solicited_login_flow_still_works_when_idp_initiated_is_allowed(
     assert acs.status_code == 303
     assert acs.headers["location"] == "/app"
     assert sp.settings.session_cookie_name in acs.headers.get("set-cookie", "")
+
+
+def test_solicited_replay_rejected_when_idp_initiated_allowed(certs, idp_metadata_file, make_idp):
+    """A replayed *solicited* response must be rejected even with allow_idp_initiated=True.
+
+    Regression test for the Plan 8 review finding: ``allow_idp_initiated=True``
+    sets pysaml2's ``allow_unsolicited=True``, which makes pysaml2 accept a
+    solicited response (``InResponseTo`` present) even when the reqid no
+    longer matches any outstanding request -- e.g. because it was already
+    consumed by an earlier POST of the identical response. The ACS handler
+    used to ignore the return value of ``pop_outstanding`` in the solicited
+    branch, so the second POST of the same response re-established a session
+    instead of being rejected as a replay.
+    """
+    app, sp = _build_app(certs, idp_metadata_file, allow_idp_initiated=True)
+    client = TestClient(app)
+
+    login = client.get("/saml/login", params={"next": "/app"}, follow_redirects=False)
+    assert login.status_code == 303
+    reqids = list(sp.store._outstanding)
+    assert len(reqids) == 1
+    reqid = reqids[0]
+
+    idp = make_idp(sp.engine.sp_metadata())
+    saml_response = mint_response(idp, reqid, _AVA)
+
+    first = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response, "RelayState": "/app"},
+        follow_redirects=False,
+    )
+    assert first.status_code == 303
+    assert first.headers["location"] == "/app"
+
+    replay = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response, "RelayState": "/app"},
+        follow_redirects=False,
+    )
+    assert replay.status_code == 400
+
+
+def test_forged_inresponseto_rejected_when_idp_initiated_allowed(
+    certs, idp_metadata_file, make_idp
+):
+    """A solicited-shaped response carrying a reqid this SP never issued must be rejected.
+
+    With ``allow_idp_initiated=True`` pysaml2 accepts any ``InResponseTo``,
+    matching or not. Without the fix, ``pop_outstanding`` for a never-issued
+    reqid returns ``None`` and the handler proceeded to establish a session
+    anyway.
+    """
+    app, sp = _build_app(certs, idp_metadata_file, allow_idp_initiated=True)
+    client = TestClient(app)
+
+    idp = make_idp(sp.engine.sp_metadata())
+    saml_response = mint_response(idp, "unused", _AVA, in_response_to="id-never-issued")
+
+    acs = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response},
+        follow_redirects=False,
+    )
+    assert acs.status_code == 400

@@ -86,10 +86,17 @@ def build_router(sp: SamlSP) -> APIRouter:
             logger.warning("SAML response rejected at ACS: %s", err)
             raise HTTPException(status_code=400, detail="Invalid SAML response") from err
         if in_response_to:
-            # Solicited: the reqid was single-use and is now consumed, which is
-            # itself the replay defense for this path (a second POST of the same
-            # response has no matching outstanding request left).
-            await sp.store.pop_outstanding(in_response_to)
+            # Solicited: the reqid must be single-use, consumed from the
+            # outstanding store exactly once. When allow_idp_initiated=True,
+            # pysaml2 sets allow_unsolicited=True and will ACCEPT a solicited
+            # response whose InResponseTo no longer matches any outstanding
+            # request (e.g. a replayed response, or a forged reqid). The
+            # return value of pop_outstanding is therefore the actual replay
+            # defense for this path and must not be ignored.
+            return_url = await sp.store.pop_outstanding(in_response_to)
+            if return_url is None:
+                logger.warning("Solicited response with no matching outstanding request")
+                raise HTTPException(status_code=400, detail="Replayed or invalid assertion")
             target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)
         else:
             # Unsolicited (IdP-initiated): only reachable when allow_idp_initiated
