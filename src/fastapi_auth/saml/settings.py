@@ -96,6 +96,13 @@ class SamlSettings(BaseSettings):
     # --- security ---
     allowed_redirect_hosts: list[str] = Field(default_factory=list)
 
+    # --- IdP-initiated (unsolicited) login (opt-in; defaults keep it disabled) ---
+    allow_idp_initiated: bool = False
+    # Landing target used when the IdP does not send a RelayState.
+    idp_initiated_default_relay_state: str = "/"
+    # Replay-cache window (seconds), sized to the assertion's validity period.
+    assertion_replay_ttl: int = 300
+
     # --- decryption (defaults to the signing key/cert pair) ---
     encryption_key_file: str | None = None
     encryption_cert_file: str | None = None

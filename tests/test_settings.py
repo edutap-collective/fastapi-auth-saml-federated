@@ -202,3 +202,27 @@ def test_mdq_with_trust_anchor_ok():
         )
     )
     assert s.trust_anchor_cert == "/tmp/anchor.pem"
+
+
+def test_idp_initiated_defaults():
+    s = SamlSettings(**_BASE)
+    assert s.allow_idp_initiated is False
+    assert s.idp_initiated_default_relay_state == "/"
+    assert s.assertion_replay_ttl == 300
+
+
+def test_idp_initiated_settings_can_be_set():
+    s = SamlSettings(
+        **cast(
+            dict[str, Any],
+            {
+                **_BASE,
+                "allow_idp_initiated": True,
+                "idp_initiated_default_relay_state": "/dashboard",
+                "assertion_replay_ttl": 600,
+            },
+        )
+    )
+    assert s.allow_idp_initiated is True
+    assert s.idp_initiated_default_relay_state == "/dashboard"
+    assert s.assertion_replay_ttl == 600
