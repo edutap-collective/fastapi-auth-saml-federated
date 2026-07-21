@@ -97,6 +97,19 @@ def _generate_sp_key_and_cert(tmp_path):
     return str(key_path), str(cert_path)
 
 
+def test_allow_unsolicited_off_by_default(tmp_path):
+    s = _settings(tmp_path, MINIMAL_IDP_MD)
+    cfg = build_sp_config(s)
+    assert cfg["service"]["sp"]["allow_unsolicited"] is False
+
+
+def test_allow_unsolicited_follows_setting(tmp_path):
+    s = _settings(tmp_path, MINIMAL_IDP_MD)
+    s.allow_idp_initiated = True
+    cfg = build_sp_config(s)
+    assert cfg["service"]["sp"]["allow_unsolicited"] is True
+
+
 def test_build_sp_config_loads_in_pysaml2(tmp_path):
     # Real IdP metadata is needed for SPConfig().load to accept it; use a
     # generated descriptor so the config actually parses.

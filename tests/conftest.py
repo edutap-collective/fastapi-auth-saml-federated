@@ -13,6 +13,11 @@ from saml2.metadata import create_metadata_string, entities_descriptor, entity_d
 from saml2.saml import NAMEID_FORMAT_PERSISTENT, NameID
 from saml2.server import Server
 
+# Sentinel distinguishing "caller omitted in_response_to" (-> use request_id, the
+# existing behavior) from an explicit `in_response_to=None` (-> mint an unsolicited
+# response, omitting InResponseTo). `Any` keeps ty happy as a default for `str | None`.
+_UNSET: Any = object()
+
 SP_EID = "urn:test:sp"
 IDP_EID = "urn:test:idp"
 ACS = "https://sp.example/saml/acs"
@@ -187,6 +192,7 @@ def mint_response(
     sign_response: bool = True,
     sign_assertion: bool = True,
     encrypt_cert: str | None = None,
+    in_response_to: str | None = _UNSET,
 ) -> str:
     """Mint a base64 SAML response as an IdP would POST to the ACS.
 
@@ -194,7 +200,13 @@ def mint_response(
     response); pass ``False`` to mint an unsigned one for negative tests.
     ``encrypt_cert`` defaults to ``None`` (unencrypted assertion); pass the
     SP's encryption certificate PEM to mint an ``EncryptedAssertion`` instead.
+    ``in_response_to`` defaults to ``request_id`` (a solicited response); pass
+    ``in_response_to=None`` explicitly to mint an unsolicited (IdP-initiated)
+    response, which omits the ``InResponseTo`` attribute entirely. Passing an
+    empty string instead of ``None`` breaks pysaml2's XSD validation, so this
+    is not exposed -- only ``None`` or the default.
     """
+    resolved_in_response_to = request_id if in_response_to is _UNSET else in_response_to
     name_id = NameID(format=NAMEID_FORMAT_PERSISTENT, text=name_id_text)
     extra_kwargs: dict[str, Any] = {}
     if encrypt_cert is not None:
@@ -202,7 +214,7 @@ def mint_response(
         extra_kwargs["encrypt_cert_assertion"] = encrypt_cert
     xml = idp.create_authn_response(
         identity=ava,
-        in_response_to=request_id,
+        in_response_to=resolved_in_response_to,
         destination=ACS,
         sp_entity_id=SP_EID,
         name_id=name_id,

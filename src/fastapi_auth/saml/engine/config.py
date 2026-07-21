@@ -70,7 +70,7 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
             "assertion_consumer_service": [(settings.acs_url, BINDING_HTTP_POST)],
             "single_logout_service": [(slo_url, BINDING_HTTP_REDIRECT)],
         },
-        "allow_unsolicited": False,
+        "allow_unsolicited": settings.allow_idp_initiated,
         "authn_requests_signed": settings.authn_requests_signed,
         "want_assertions_signed": settings.want_assertions_signed,
         "want_response_signed": False,

@@ -54,6 +54,31 @@ async def test_roundtrip_yields_federated_identity(certs, idp_metadata_file, mak
     assert in_response_to == reqid
 
 
+async def test_unsolicited_response_accepted_when_allowed(certs, idp_metadata_file, make_idp):
+    """An unsolicited response (no InResponseTo, no matching outstanding) is accepted.
+
+    This is a sanity check for the ``allow_unsolicited`` wiring: it only
+    proves the response is accepted once ``allow_idp_initiated=True`` flows
+    through to the pysaml2 SP config. The full ACS-endpoint unsolicited flow
+    is exercised in a later task.
+    """
+    settings = _settings(certs, idp_metadata_file)
+    settings.allow_idp_initiated = True
+    engine = SamlEngine(settings)
+
+    idp = make_idp(engine.sp_metadata())
+    saml_response = mint_response(
+        idp,
+        "ignored",
+        ava={"eduPersonPrincipalName": ["u123@test.de"]},
+        in_response_to=None,
+    )
+
+    identity, in_response_to = await engine.parse_response(saml_response, outstanding={})
+    assert identity.eppn == "u123@test.de"
+    assert in_response_to == ""
+
+
 async def test_unsigned_assertion_is_rejected(certs, idp_metadata_file, make_idp):
     """want_assertions_signed=True must reject a response with an unsigned assertion."""
     settings = _settings(certs, idp_metadata_file)
