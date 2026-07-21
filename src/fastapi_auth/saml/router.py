@@ -85,13 +85,31 @@ def build_router(sp: SamlSP) -> APIRouter:
         except SamlResponseError as err:
             logger.warning("SAML response rejected at ACS: %s", err)
             raise HTTPException(status_code=400, detail="Invalid SAML response") from err
+        if in_response_to:
+            # Solicited: the reqid was single-use and is now consumed, which is
+            # itself the replay defense for this path (a second POST of the same
+            # response has no matching outstanding request left).
+            await sp.store.pop_outstanding(in_response_to)
+            target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)
+        else:
+            # Unsolicited (IdP-initiated): only reachable when allow_idp_initiated
+            # is True -- pysaml2 itself rejects unsolicited responses otherwise,
+            # surfacing as SamlResponseError above. There is no outstanding reqid
+            # to consume, so the assertion ID is replay-checked explicitly instead.
+            if not identity.assertion_id or await sp.store.seen_assertion(
+                identity.assertion_id, sp.settings.assertion_replay_ttl
+            ):
+                logger.warning("Unsolicited assertion replay or missing id")
+                raise HTTPException(status_code=400, detail="Replayed or invalid assertion")
+            target = is_safe_redirect(
+                RelayState or sp.settings.idp_initiated_default_relay_state,
+                sp.settings.allowed_redirect_hosts,
+            )
         try:
             check_required_attributes(identity, sp.settings.required_attributes)
         except AttributeReleaseError as err:
             logger.warning("Attribute release insufficient, missing: %s", err.missing)
             raise HTTPException(status_code=403, detail=str(err)) from err
-        await sp.store.pop_outstanding(in_response_to)
-        target = is_safe_redirect(RelayState or "/", sp.settings.allowed_redirect_hosts)
         response = RedirectResponse(target, status_code=303)
         await sp.backend.establish(identity, response)
         return response
