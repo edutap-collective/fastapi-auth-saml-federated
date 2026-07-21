@@ -17,7 +17,13 @@ _AVA = {
 }
 
 
-def _build_app(certs, idp_metadata_file, *, allow_idp_initiated: bool):
+def _build_app(
+    certs,
+    idp_metadata_file,
+    *,
+    allow_idp_initiated: bool,
+    idp_initiated_default_relay_state: str = "/",
+):
     settings = SamlSettings(
         entity_id="urn:test:sp",
         base_url="https://sp.example",
@@ -28,6 +34,7 @@ def _build_app(certs, idp_metadata_file, *, allow_idp_initiated: bool):
         session_secret="s3cr3t",
         cookie_secure=False,
         allow_idp_initiated=allow_idp_initiated,
+        idp_initiated_default_relay_state=idp_initiated_default_relay_state,
     )
     sp = SamlSP(settings)
     app = FastAPI()
@@ -64,6 +71,40 @@ def test_unsolicited_response_succeeds_and_redirects_to_default_relay_state(
     assert me.status_code == 200
     assert me.json()["eppn"] == "u123@test.de"
     assert me.json()["affiliation"] == ["staff@test.de"]
+
+
+def test_unsolicited_response_uses_configured_default_relay_state_when_omitted(
+    certs, idp_metadata_file, make_idp
+):
+    """A non-default idp_initiated_default_relay_state must fire when RelayState is omitted.
+
+    Regression test for the Plan 8 docs-review bug: the ACS handler used to
+    declare ``RelayState: Annotated[str, Form()] = "/"``, so FastAPI filled in
+    ``"/"`` whenever the IdP omitted the field entirely (the common
+    IdP-initiated case). ``RelayState or idp_initiated_default_relay_state``
+    then always short-circuited on ``"/"``, so a configured
+    ``idp_initiated_default_relay_state`` such as ``"/dashboard"`` never took
+    effect. With the fixed ``= None`` default, an omitted field is
+    distinguishable from an explicit ``"/"`` and the configured default fires.
+    """
+    app, sp = _build_app(
+        certs,
+        idp_metadata_file,
+        allow_idp_initiated=True,
+        idp_initiated_default_relay_state="/dashboard",
+    )
+    client = TestClient(app)
+
+    idp = make_idp(sp.engine.sp_metadata())
+    saml_response = mint_response(idp, "unused", _AVA, in_response_to=None)
+
+    acs = client.post(
+        "/saml/acs",
+        data={"SAMLResponse": saml_response},
+        follow_redirects=False,
+    )
+    assert acs.status_code == 303
+    assert acs.headers["location"] == "/dashboard"
 
 
 def test_unsolicited_response_honors_safe_relay_state(certs, idp_metadata_file, make_idp):

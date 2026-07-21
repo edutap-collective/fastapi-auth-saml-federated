@@ -77,7 +77,7 @@ def build_router(sp: SamlSP) -> APIRouter:
     @router.post("/acs")
     async def acs(
         SAMLResponse: Annotated[str, Form()],
-        RelayState: Annotated[str, Form()] = "/",
+        RelayState: Annotated[str | None, Form()] = None,
     ) -> RedirectResponse:
         outstanding = await sp.store.outstanding()
         try:
