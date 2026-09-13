@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.13-slim AS build
+FROM python:3.14-slim AS build
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 # uv for fast, reproducible installs
@@ -9,7 +9,7 @@ COPY src ./src
 RUN uv pip install --system --no-cache ".[redis,postgres]"
 RUN rm -f /usr/local/bin/uv
 
-FROM python:3.13-slim AS runtime
+FROM python:3.14-slim AS runtime
 ENV PYTHONUNBUFFERED=1
 # xmlsec1 binary (pysaml2 shells out to it); libxml2 runtime deps come with it
 RUN apt-get update \
