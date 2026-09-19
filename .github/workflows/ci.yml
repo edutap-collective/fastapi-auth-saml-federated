@@ -9,7 +9,7 @@ jobs:
       matrix:
         python: ["3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       - uses: astral-sh/setup-uv@v5
       - run: uv python install ${{ matrix.python }}
@@ -33,7 +33,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       - uses: astral-sh/setup-uv@v5
       - run: uv pip install --system -e ".[dev,postgres]"
@@ -44,12 +44,12 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t fa-saml:ci .
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v5
       - run: uv pip install --system -e ".[docs]"
       - run: uv run sphinx-build -W -b html docs docs/_build
