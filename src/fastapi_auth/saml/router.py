@@ -15,6 +15,7 @@ from saml2 import BINDING_HTTP_REDIRECT
 
 from fastapi_auth.saml.discovery.embedded import render_wayf
 from fastapi_auth.saml.discovery.external import ds_redirect_url, parse_ds_return
+from fastapi_auth.saml.engine.authn_context import AuthnContextError
 from fastapi_auth.saml.engine.enforcement import check_required_attributes
 from fastapi_auth.saml.engine.errors import AttributeReleaseError, SamlResponseError
 from fastapi_auth.saml.redirect import is_safe_redirect
@@ -30,7 +31,9 @@ logger = logging.getLogger("fastapi_auth.saml")
 async def _start_login(sp: SamlSP, next_url: str, idp_entity_id: str | None) -> RedirectResponse:
     """Issue an AuthnRequest to ``idp_entity_id`` (or the fixed IdP) and redirect the browser."""
     request_id, location = await sp.engine.create_authn_request(
-        relay_state=next_url, idp_entity_id=idp_entity_id
+        relay_state=next_url,
+        idp_entity_id=idp_entity_id,
+        requested_authn_context=sp.requested_authn_context,
     )
     await sp.store.add_outstanding(request_id, next_url, sp.settings.outstanding_ttl)
     return RedirectResponse(location, status_code=303)
@@ -81,10 +84,17 @@ def build_router(sp: SamlSP) -> APIRouter:
     ) -> RedirectResponse:
         outstanding = await sp.store.outstanding()
         try:
-            identity, in_response_to = await sp.engine.parse_response(SAMLResponse, outstanding)
+            identity, in_response_to = await sp.engine.parse_response(
+                SAMLResponse, outstanding, requested_authn_context=sp.requested_authn_context
+            )
         except SamlResponseError as err:
             logger.warning("SAML response rejected at ACS: %s", err)
             raise HTTPException(status_code=400, detail="Invalid SAML response") from err
+        except AuthnContextError as err:
+            logger.warning("Authentication context rejected at ACS: %s", err)
+            raise HTTPException(
+                status_code=403, detail="Insufficient authentication context"
+            ) from err
         if in_response_to:
             # Solicited: the reqid must be single-use, consumed from the
             # outstanding store exactly once. When allow_idp_initiated=True,

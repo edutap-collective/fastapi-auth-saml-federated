@@ -8,6 +8,12 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 
 from __future__ import annotations
 
+from fastapi_auth.saml.engine.authn_context import (
+    REFEDS_MFA,
+    AuthnContextError,
+    RequestedAuthnContext,
+)
+from fastapi_auth.saml.engine.client import SamlEngine
 from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.mapper import map_attributes
 from fastapi_auth.saml.identity.model import FederatedIdentity
@@ -15,7 +21,11 @@ from fastapi_auth.saml.settings import SamlSettings
 from fastapi_auth.saml.sp import SamlSP
 
 __all__ = [
+    "REFEDS_MFA",
+    "AuthnContextError",
     "FederatedIdentity",
+    "RequestedAuthnContext",
+    "SamlEngine",
     "SamlSP",
     "SamlSettings",
     "__version__",

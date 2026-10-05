@@ -12,6 +12,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request, status
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from fastapi_auth.saml.engine.authn_context import RequestedAuthnContext
 from fastapi_auth.saml.engine.client import SamlEngine
 from fastapi_auth.saml.factory import make_backend, make_store
 from fastapi_auth.saml.identity.identifier import select_identifier
@@ -25,9 +26,22 @@ _WAYF_TEMPLATES_DIR = Path(__file__).parent / "wayf" / "templates"
 class SamlSP:
     """Composition root: one configured SAML service provider."""
 
-    def __init__(self, settings: SamlSettings) -> None:
-        """Build the engine, store, session backend, WAYF renderer and router from settings."""
+    def __init__(
+        self,
+        settings: SamlSettings,
+        *,
+        requested_authn_context: RequestedAuthnContext | None = None,
+    ) -> None:
+        """Build the engine, store, session backend, WAYF renderer and router from settings.
+
+        ``requested_authn_context`` is sent with every login this SP's router
+        starts, and every response at its ACS -- solicited or IdP-initiated --
+        must satisfy it (otherwise ``403``). For a context that varies per
+        login, mount one ``SamlSP`` per context or call
+        :class:`~fastapi_auth.saml.engine.client.SamlEngine` directly.
+        """
         self.settings = settings
+        self.requested_authn_context = requested_authn_context
         self.engine = SamlEngine(settings)
         self.store = make_store(settings)
         self.backend = make_backend(settings, self.store)

@@ -18,6 +18,7 @@ from saml2.client import Saml2Client
 from saml2.config import SPConfig
 from saml2.metadata import create_metadata_string
 
+from fastapi_auth.saml.engine.authn_context import RequestedAuthnContext, check_authn_context
 from fastapi_auth.saml.engine.config import build_sp_config
 from fastapi_auth.saml.engine.errors import SamlResponseError
 from fastapi_auth.saml.engine.logout import build_logout_redirect, parse_logout_response
@@ -58,6 +59,19 @@ def _extract_authn_instant(authn_info: list[Any]) -> datetime | None:
     return None
 
 
+def _authn_class_refs(authn_info: list[Any]) -> list[str]:
+    """Return the ``AuthnContextClassRef`` of every AuthnStatement in ``authn_info``.
+
+    Entries without a class ref (e.g. only an ``AuthnContextDeclRef``) are
+    skipped, so they can never satisfy a requested context.
+    """
+    return [
+        str(entry[0])
+        for entry in authn_info
+        if isinstance(entry, tuple) and entry and isinstance(entry[0], str) and entry[0]
+    ]
+
+
 def to_identity(resp: Any) -> FederatedIdentity:
     """Map a validated pysaml2 AuthnResponse onto a FederatedIdentity.
 
@@ -89,35 +103,69 @@ class SamlEngine:
         self._client = Saml2Client(config=self._config)
 
     async def create_authn_request(
-        self, relay_state: str, idp_entity_id: str | None = None
+        self,
+        relay_state: str,
+        idp_entity_id: str | None = None,
+        *,
+        requested_authn_context: RequestedAuthnContext | None = None,
     ) -> tuple[str, str]:
         """Build a signed AuthnRequest; return (request_id, redirect URL).
 
         ``idp_entity_id`` selects the target IdP for federation discovery
         (embedded/external WAYF); it defaults to ``settings.fixed_idp_entity_id``
         for the single-IdP passthrough case.
+
+        ``requested_authn_context`` adds a ``<samlp:RequestedAuthnContext>`` to
+        this one request only. The IdP may ignore it, so pass the same object
+        to :meth:`parse_response` to have the result checked.
         """
         resolved_idp = idp_entity_id or self._settings.fixed_idp_entity_id
-        return await anyio.to_thread.run_sync(self._prepare, relay_state, resolved_idp)
+        return await anyio.to_thread.run_sync(
+            self._prepare, relay_state, resolved_idp, requested_authn_context
+        )
 
-    def _prepare(self, relay_state: str, idp_entity_id: str) -> tuple[str, str]:
+    def _prepare(
+        self,
+        relay_state: str,
+        idp_entity_id: str,
+        requested_authn_context: RequestedAuthnContext | None = None,
+    ) -> tuple[str, str]:
+        extra: dict[str, Any] = {}
+        if requested_authn_context is not None:
+            extra["requested_authn_context"] = requested_authn_context.to_saml()
         reqid, info = self._client.prepare_for_authenticate(
             entityid=idp_entity_id,
             relay_state=relay_state,
             binding=BINDING_HTTP_REDIRECT,
             sign=self._settings.authn_requests_signed,
+            **extra,
         )
         location = dict(info["headers"])["Location"]
         return reqid, location
 
     async def parse_response(
-        self, saml_response: str, outstanding: dict[str, str]
+        self,
+        saml_response: str,
+        outstanding: dict[str, str],
+        *,
+        requested_authn_context: RequestedAuthnContext | None = None,
     ) -> tuple[FederatedIdentity, str]:
-        """Validate a base64 SAML response; return (identity, in_response_to)."""
-        return await anyio.to_thread.run_sync(self._parse, saml_response, outstanding)
+        """Validate a base64 SAML response; return (identity, in_response_to).
+
+        Raises :class:`SamlResponseError` for an invalid response. With
+        ``requested_authn_context``, a valid response whose
+        ``AuthnContextClassRef`` does not satisfy it raises
+        :class:`~fastapi_auth.saml.engine.authn_context.AuthnContextError`.
+        """
+        return await anyio.to_thread.run_sync(
+            self._parse, saml_response, outstanding, requested_authn_context
+        )
 
     def _parse(
-        self, saml_response: str, outstanding: dict[str, str]
+        self,
+        saml_response: str,
+        outstanding: dict[str, str],
+        requested_authn_context: RequestedAuthnContext | None,
     ) -> tuple[FederatedIdentity, str]:
         try:
             resp = self._client.parse_authn_request_response(
@@ -128,6 +176,9 @@ class SamlEngine:
             raise SamlResponseError(str(err)) from err
         if resp is None:
             raise SamlResponseError("SAML response could not be parsed")
+        if requested_authn_context is not None:
+            authn_info = resp.session_info().get("authn_info") or []
+            check_authn_context(requested_authn_context, _authn_class_refs(authn_info))
         in_response_to = resp.in_response_to or ""  # pysaml2 untyped
         return to_identity(resp), in_response_to
 
