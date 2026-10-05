@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastapi-auth-saml-federated"
-version = "0.1.0.dev0"
+version = "0.2.0"
 description = "Federated SAML2 Service Provider for FastAPI (Shibboleth/eduGAIN/NREN AAIs)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -49,10 +49,14 @@ dev = [
     "aiosqlite>=0.20",
     "redis>=5",
     "sqlmodel>=0.0.22",
+    # SQLAlchemy's asyncio layer needs greenlet; SQLAlchemy only pulls it in on some
+    # platforms (not on macOS arm64).
+    "greenlet",
 ]
 
 [project.urls]
-Repository = "https://github.com/loechel/fastapi-auth-saml-federated"
+Repository = "https://github.com/edutap-collective/fastapi-auth-saml-federated"
+Changelog = "https://github.com/edutap-collective/fastapi-auth-saml-federated/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -65,6 +69,8 @@ namespaces = true
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+# Design records and plans are dated snapshots: never reformat their code samples.
+extend-exclude = ["docs/superpowers"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "UP", "I", "D", "S"]
@@ -87,4 +93,12 @@ filterwarnings = [
     # Upstream Starlette/httpx transition: FastAPI's TestClient still imports httpx (0.x);
     # Starlette nudges toward httpx2. Not our code. Revisit when the ecosystem settles.
     "ignore:Using `httpx` with `starlette.testclient` is deprecated:Warning",
+    # Upstream pysaml2 (saml2.cryptography.symmetric) still references modes.CFB at import
+    # time, which newer cryptography releases deprecate. Not our code.
+    "ignore:CFB has been moved:Warning",
+    # Upstream xmlschema (via pysaml2) calls PurePath.as_uri(), deprecated in Python 3.14.
+    "ignore:pathlib.PurePath.as_uri\\(\\) is deprecated:DeprecationWarning",
+    # Upstream pysaml2 (saml2.sigver) leaves NamedTemporaryFiles for xmlsec1 to the garbage
+    # collector; Python 3.14 reports that as ResourceWarning from the deallocator.
+    "ignore:Exception ignored while calling deallocator <function _TemporaryFileCloser:pytest.PytestUnraisableExceptionWarning",
 ]

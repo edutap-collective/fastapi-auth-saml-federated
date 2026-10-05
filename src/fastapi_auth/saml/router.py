@@ -15,14 +15,18 @@ from saml2 import BINDING_HTTP_REDIRECT
 
 from fastapi_auth.saml.discovery.embedded import render_wayf
 from fastapi_auth.saml.discovery.external import ds_redirect_url, parse_ds_return
+from fastapi_auth.saml.engine.authn_context import AuthnContextError
 from fastapi_auth.saml.engine.enforcement import check_required_attributes
 from fastapi_auth.saml.engine.errors import AttributeReleaseError, SamlResponseError
 from fastapi_auth.saml.redirect import is_safe_redirect
+from fastapi_auth.saml.session.csrf import verify_logout_csrf_token
 
 if TYPE_CHECKING:
     from fastapi_auth.saml.sp import SamlSP
 
 _METADATA_MEDIA_TYPE = "application/samlmetadata+xml"
+_LOGOUT_TEMPLATE = "logout.html"
+_NO_FRAMING = {"X-Frame-Options": "DENY", "Content-Security-Policy": "frame-ancestors 'none'"}
 
 logger = logging.getLogger("fastapi_auth.saml")
 
@@ -30,14 +34,16 @@ logger = logging.getLogger("fastapi_auth.saml")
 async def _start_login(sp: SamlSP, next_url: str, idp_entity_id: str | None) -> RedirectResponse:
     """Issue an AuthnRequest to ``idp_entity_id`` (or the fixed IdP) and redirect the browser."""
     request_id, location = await sp.engine.create_authn_request(
-        relay_state=next_url, idp_entity_id=idp_entity_id
+        relay_state=next_url,
+        idp_entity_id=idp_entity_id,
+        requested_authn_context=sp.requested_authn_context,
     )
     await sp.store.add_outstanding(request_id, next_url, sp.settings.outstanding_ttl)
     return RedirectResponse(location, status_code=303)
 
 
 def build_router(sp: SamlSP) -> APIRouter:
-    """Build the /login, /acs, /metadata and /disco routes bound to this SamlSP."""
+    """Build the /login, /disco, /acs, /metadata and /slo routes bound to this SamlSP."""
     router = APIRouter()
 
     @router.get("/login")
@@ -81,10 +87,17 @@ def build_router(sp: SamlSP) -> APIRouter:
     ) -> RedirectResponse:
         outstanding = await sp.store.outstanding()
         try:
-            identity, in_response_to = await sp.engine.parse_response(SAMLResponse, outstanding)
+            identity, in_response_to = await sp.engine.parse_response(
+                SAMLResponse, outstanding, requested_authn_context=sp.requested_authn_context
+            )
         except SamlResponseError as err:
             logger.warning("SAML response rejected at ACS: %s", err)
             raise HTTPException(status_code=400, detail="Invalid SAML response") from err
+        except AuthnContextError as err:
+            logger.warning("Authentication context rejected at ACS: %s", err)
+            raise HTTPException(
+                status_code=403, detail="Insufficient authentication context"
+            ) from err
         if in_response_to:
             # Solicited: the reqid must be single-use, consumed from the
             # outstanding store exactly once. When allow_idp_initiated=True,
@@ -126,7 +139,36 @@ def build_router(sp: SamlSP) -> APIRouter:
         return Response(sp.engine.sp_metadata(), media_type=_METADATA_MEDIA_TYPE)
 
     @router.get("/slo")
-    async def slo(request: Request, next: str = "/") -> Response:
+    async def slo_confirm(request: Request, next: str = "/") -> Response:
+        # GET never changes state (issue #15): a cross-site link, redirect or
+        # <img> must not end the session. It only renders a confirmation form
+        # that POSTs back with the session-bound CSRF token.
+        safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
+        csrf_token = sp.logout_csrf_token(request)
+        if csrf_token is None or await sp.backend.load(request) is None:
+            return RedirectResponse(safe_next, status_code=303)
+        html = sp._jinja.get_template(_LOGOUT_TEMPLATE).render(
+            action=sp.settings.slo_path, csrf_token=csrf_token, next_url=safe_next
+        )
+        # Framing the page would let another site trick the user into the click.
+        return Response(html, media_type="text/html", headers=_NO_FRAMING)
+
+    @router.post("/slo")
+    async def slo(
+        request: Request,
+        csrf_token: Annotated[str | None, Form()] = None,
+        next: Annotated[str, Form()] = "/",
+    ) -> Response:
+        # A session cookie is ambient authority: with one present, the POST must
+        # carry the token bound to it. Without one, a forged POST has nothing to
+        # end (a Bearer token is never sent cross-site by the browser).
+        session_cookie = request.cookies.get(sp.settings.session_cookie_name)
+        if session_cookie and not verify_logout_csrf_token(
+            sp.settings.session_secret, session_cookie, csrf_token
+        ):
+            logger.warning("Logout rejected: missing or invalid CSRF token")
+            raise HTTPException(status_code=403, detail="Invalid logout token")
+
         safe_next = is_safe_redirect(next, sp.settings.allowed_redirect_hosts)
         identity = await sp.backend.load(request)
 

@@ -23,6 +23,7 @@ IDP_EID = "urn:test:idp"
 ACS = "https://sp.example/saml/acs"
 SSO = "https://idp.example/sso"
 SLO = "https://idp.example/slo"
+PASSWORD_PROTECTED_TRANSPORT = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"  # noqa: S105
 
 # Resolved once from PATH so tests don't depend on a hardcoded (e.g. Homebrew-only)
 # install location; tests that need them are skipped if not found.
@@ -193,6 +194,7 @@ def mint_response(
     sign_assertion: bool = True,
     encrypt_cert: str | None = None,
     in_response_to: str | None = _UNSET,
+    authn_class_ref: str = PASSWORD_PROTECTED_TRANSPORT,
 ) -> str:
     """Mint a base64 SAML response as an IdP would POST to the ACS.
 
@@ -205,6 +207,7 @@ def mint_response(
     response, which omits the ``InResponseTo`` attribute entirely. Passing an
     empty string instead of ``None`` breaks pysaml2's XSD validation, so this
     is not exposed -- only ``None`` or the default.
+    ``authn_class_ref`` is the ``AuthnContextClassRef`` the IdP asserts.
     """
     resolved_in_response_to = request_id if in_response_to is _UNSET else in_response_to
     name_id = NameID(format=NAMEID_FORMAT_PERSISTENT, text=name_id_text)
@@ -221,7 +224,7 @@ def mint_response(
         sign_response=sign_response,
         sign_assertion=sign_assertion,
         authn={
-            "class_ref": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+            "class_ref": authn_class_ref,
             "authn_auth": IDP_EID,
         },
         **extra_kwargs,

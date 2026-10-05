@@ -101,6 +101,14 @@ Discovery Service via `ds_url`), or `"embedded"` (a WAYF page rendered by the SP
 itself). See the how-tos for testing against a local SimpleSAMLphp IdP, the
 LMU `lmuidp-container` (Shibboleth), and the DFN-AAI test federation.
 
+## Authentication context and logout
+
+A login can request an authentication context such as REFEDS MFA and have the
+asserted one checked -- per login via `SamlEngine`, or for the whole router via
+`SamlSP(settings, requested_authn_context=...)`; see `docs/howto/authn-context.md`.
+Logging out is a `POST` to `{mount_path}/slo` with a CSRF token;
+`GET {mount_path}/slo` only renders a confirmation form (`docs/howto/logout.md`).
+
 ## Docs
 
 Full documentation (Sphinx + MyST) lives in `docs/`:

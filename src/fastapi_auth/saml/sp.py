@@ -12,11 +12,13 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request, status
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from fastapi_auth.saml.engine.authn_context import RequestedAuthnContext
 from fastapi_auth.saml.engine.client import SamlEngine
 from fastapi_auth.saml.factory import make_backend, make_store
 from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.router import build_router
+from fastapi_auth.saml.session.csrf import logout_csrf_token
 from fastapi_auth.saml.settings import SamlSettings
 
 _WAYF_TEMPLATES_DIR = Path(__file__).parent / "wayf" / "templates"
@@ -25,14 +27,28 @@ _WAYF_TEMPLATES_DIR = Path(__file__).parent / "wayf" / "templates"
 class SamlSP:
     """Composition root: one configured SAML service provider."""
 
-    def __init__(self, settings: SamlSettings) -> None:
-        """Build the engine, store, session backend, WAYF renderer and router from settings."""
+    def __init__(
+        self,
+        settings: SamlSettings,
+        *,
+        requested_authn_context: RequestedAuthnContext | None = None,
+    ) -> None:
+        """Build the engine, store, session backend, WAYF renderer and router from settings.
+
+        ``requested_authn_context`` is sent with every login this SP's router
+        starts, and every response at its ACS -- solicited or IdP-initiated --
+        must satisfy it (otherwise ``403``). For a context that varies per
+        login, mount one ``SamlSP`` per context or call
+        :class:`~fastapi_auth.saml.engine.client.SamlEngine` directly.
+        """
         self.settings = settings
+        self.requested_authn_context = requested_authn_context
         self.engine = SamlEngine(settings)
         self.store = make_store(settings)
         self.backend = make_backend(settings, self.store)
         # autoescape MUST stay on: the embedded WAYF page renders untrusted
-        # display names/entity IDs sourced from federation metadata.
+        # display names/entity IDs sourced from federation metadata, and the
+        # logout confirmation page renders the caller-supplied ``next``.
         self._jinja = Environment(
             loader=FileSystemLoader(_WAYF_TEMPLATES_DIR), autoescape=select_autoescape()
         )
@@ -58,6 +74,19 @@ class SamlSP:
             return identity
 
         return _dep
+
+    def logout_csrf_token(self, request: Request) -> str | None:
+        """Return the CSRF token a logout ``POST`` to ``/slo`` must carry, or None.
+
+        For apps that render their own logout button: put the token into a
+        hidden ``csrf_token`` field of a form that POSTs to ``{mount_path}/slo``.
+        It is bound to the current session cookie; ``None`` means there is no
+        session cookie and nothing to protect.
+        """
+        session_cookie = request.cookies.get(self.settings.session_cookie_name)
+        if not session_cookie:
+            return None
+        return logout_csrf_token(self.settings.session_secret, session_cookie)
 
     def identifier(self, identity: FederatedIdentity) -> str | None:
         """Return this SP's chosen stable identifier for the identity."""
