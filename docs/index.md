@@ -105,6 +105,7 @@ howto/stores
 howto/idp-initiated
 howto/authn-context
 howto/logout
+howto/release
 howto/simplesamlphp
 howto/lmuidp
 howto/dfn-aai
