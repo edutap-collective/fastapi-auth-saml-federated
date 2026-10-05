@@ -36,6 +36,8 @@ from fastapi.responses import HTMLResponse
 @app.get("/account", response_class=HTMLResponse)
 async def account(request: Request) -> str:
     token = sp.logout_csrf_token(request)
+    if token is None:  # no session cookie: nothing to log out of
+        return '<a href="/saml/login">Log in</a>'
     return f"""
       <form method="post" action="{sp.settings.slo_path}">
         <input type="hidden" name="csrf_token" value="{token}">

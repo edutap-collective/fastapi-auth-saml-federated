@@ -1,6 +1,6 @@
 """Best-effort SP-initiated Single Logout (SLO): LogoutRequest build + local invalidation."""
 
-import re
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -13,6 +13,7 @@ from tests.conftest import IDP_EID, SLO, SSO, mint_response
 
 from fastapi_auth.saml.engine.client import SamlEngine
 from fastapi_auth.saml.identity.model import FederatedIdentity
+from fastapi_auth.saml.session.csrf import verify_logout_csrf_token
 from fastapi_auth.saml.settings import SamlSettings
 from fastapi_auth.saml.sp import SamlSP
 
@@ -85,14 +86,35 @@ def _login(client, sp, make_idp):
     assert sp.settings.session_cookie_name in acs.headers.get("set-cookie", "")
 
 
+class _FormParser(HTMLParser):
+    """Collect the method, action and hidden fields of the page's form."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.method: str | None = None
+        self.action: str | None = None
+        self.fields: dict[str, str] = {}
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = {name: value or "" for name, value in attrs}
+        if tag == "form":
+            self.method = values.get("method", "").lower()
+            self.action = values.get("action")
+        elif tag == "input" and values.get("type") == "hidden":
+            self.fields[values["name"]] = values.get("value", "")
+
+
 def _logout_form(client, next_url: str | None = None) -> dict[str, str]:
     """GET the logout confirmation page and return the fields of its POST form."""
     params = {"next": next_url} if next_url is not None else {}
     page = client.get("/saml/slo", params=params, follow_redirects=False)
     assert page.status_code == 200
     assert page.headers["content-type"].startswith("text/html")
-    assert re.search(r'<form method="post" action="/saml/slo">', page.text)
-    return dict(re.findall(r'<input type="hidden" name="(\w+)" value="([^"]*)"', page.text))
+    form = _FormParser()
+    form.feed(page.text)
+    assert form.method == "post"
+    assert form.action == "/saml/slo"
+    return form.fields
 
 
 def _logout(client):
@@ -300,6 +322,10 @@ def test_slo_post_with_non_ascii_token_is_rejected_not_an_error(certs, idp_metad
     slo = client.post("/saml/slo", data={"csrf_token": "ä"}, follow_redirects=False)
 
     assert slo.status_code == 403
+
+
+def test_slo_post_with_lone_surrogate_token_is_rejected_not_an_error():
+    assert verify_logout_csrf_token("s3cr3t", "cookie", "\ud800") is False
 
 
 def test_slo_token_is_bound_to_the_session(certs, idp_metadata_file, make_idp):

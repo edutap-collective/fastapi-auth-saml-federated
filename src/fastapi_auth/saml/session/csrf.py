@@ -27,6 +27,11 @@ def verify_logout_csrf_token(secret: str, session_cookie: str, token: str | None
     """Return whether ``token`` is the logout CSRF token for ``session_cookie`` (constant time)."""
     if not token:
         return False
-    # Compare bytes: compare_digest raises TypeError for non-ASCII str input.
+    # Compare bytes: hmac.compare_digest() only accepts ASCII-only str, and form
+    # input is attacker-controlled (non-ASCII, even lone surrogates).
+    try:
+        presented = token.encode()
+    except UnicodeEncodeError:
+        return False
     expected = logout_csrf_token(secret, session_cookie).encode()
-    return hmac.compare_digest(expected, token.encode())
+    return hmac.compare_digest(expected, presented)

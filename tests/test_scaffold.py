@@ -5,10 +5,6 @@ from importlib.metadata import version
 import fastapi_auth.saml as saml
 
 
-def test_package_imports_via_namespace():
-    assert saml.__version__ == "0.2.0"
-
-
 def test_version_matches_distribution_metadata():
     assert saml.__version__ == version("fastapi-auth-saml-federated")
 
