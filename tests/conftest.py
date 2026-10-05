@@ -3,8 +3,10 @@
 import base64
 import shutil
 import subprocess
+from contextlib import AbstractContextManager, nullcontext
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from saml2 import BINDING_HTTP_REDIRECT
@@ -195,6 +197,7 @@ def mint_response(
     encrypt_cert: str | None = None,
     in_response_to: str | None = _UNSET,
     authn_class_ref: str = PASSWORD_PROTECTED_TRANSPORT,
+    attribute_xml_attributes: dict[str, dict[str, str]] | None = None,
 ) -> str:
     """Mint a base64 SAML response as an IdP would POST to the ACS.
 
@@ -208,6 +211,9 @@ def mint_response(
     empty string instead of ``None`` breaks pysaml2's XSD validation, so this
     is not exposed -- only ``None`` or the default.
     ``authn_class_ref`` is the ``AuthnContextClassRef`` the IdP asserts.
+    ``attribute_xml_attributes`` maps an attribute (by ``Name`` or
+    ``FriendlyName``) to extra XML attributes set on its ``<saml:Attribute>``
+    before signing and encryption, e.g. ``akdb:TrustLevel`` in Clark notation.
     """
     resolved_in_response_to = request_id if in_response_to is _UNSET else in_response_to
     name_id = NameID(format=NAMEID_FORMAT_PERSISTENT, text=name_id_text)
@@ -215,20 +221,40 @@ def mint_response(
     if encrypt_cert is not None:
         extra_kwargs["encrypt_assertion"] = True
         extra_kwargs["encrypt_cert_assertion"] = encrypt_cert
-    xml = idp.create_authn_response(
-        identity=ava,
-        in_response_to=resolved_in_response_to,
-        destination=ACS,
-        sp_entity_id=SP_EID,
-        name_id=name_id,
-        sign_response=sign_response,
-        sign_assertion=sign_assertion,
-        authn={
-            "class_ref": authn_class_ref,
-            "authn_auth": IDP_EID,
-        },
-        **extra_kwargs,
-    )
+    patcher: AbstractContextManager[Any] = nullcontext()
+    if attribute_xml_attributes:
+        xml_attributes = attribute_xml_attributes
+        original_setup_assertion = idp.setup_assertion
+
+        def _setup_assertion(*args: Any, **kwargs: Any) -> Any:
+            # pysaml2 offers no hook for XML attributes on <saml:Attribute>; set
+            # them on the assertion object before the IdP signs/encrypts it.
+            assertion = original_setup_assertion(*args, **kwargs)
+            for statement in assertion.attribute_statement:
+                for attribute in statement.attribute:
+                    extra = xml_attributes.get(attribute.name) or xml_attributes.get(
+                        attribute.friendly_name
+                    )
+                    if extra:
+                        attribute.extension_attributes.update(extra)
+            return assertion
+
+        patcher = patch.object(idp, "setup_assertion", _setup_assertion)
+    with patcher:
+        xml = idp.create_authn_response(
+            identity=ava,
+            in_response_to=resolved_in_response_to,
+            destination=ACS,
+            sp_entity_id=SP_EID,
+            name_id=name_id,
+            sign_response=sign_response,
+            sign_assertion=sign_assertion,
+            authn={
+                "class_ref": authn_class_ref,
+                "authn_auth": IDP_EID,
+            },
+            **extra_kwargs,
+        )
     # pysaml2 only returns a plain string when a signing step ran (it hands back
     # the signed_instance_factory output); an entirely unsigned response comes
     # back as the samlp.Response object itself, so normalize before encoding.
