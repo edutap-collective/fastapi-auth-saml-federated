@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-06
+
+### Added
+
+- `SamlEngine.create_authn_request(..., extensions=)` puts namespaced XML
+  elements into `<samlp:Extensions>` of that one AuthnRequest, signed with
+  it. Accepts pysaml2 `ExtensionElement` objects or any
+  `AuthnRequestExtension` (an object with `to_extension_element()`);
+  `extension_element_from_xml()` parses one from a string.
+- `SamlEngine.parse_response_details()` validates like `parse_response()`
+  and returns a `ParsedAuthnResponse` with the identity, `in_response_to` and
+  every `<saml:Attribute>` as a `SamlAttribute`, XML attributes included.
+- `fastapi_auth.saml.akdb` for BundID: `AuthenticationRequest` (requested
+  attributes by OID, `DisplayInformation`, optional `AuthnMethods`),
+  `trust_level()` and the ordered `TrustLevel` for `akdb:TrustLevel`,
+  `STORK_QAA_LEVELS` as a `RequestedAuthnContext` ranking, and `BPK2`.
+
+`parse_response()` and `FederatedIdentity` are unchanged.
+
 ## [0.2.0] - 2026-10-06
 
 First release on PyPI.
@@ -41,4 +60,5 @@ First release on PyPI.
 
 Development version, never published.
 
+[0.3.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/22f5ff9...v0.2.0

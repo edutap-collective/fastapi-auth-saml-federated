@@ -104,6 +104,7 @@ howto/docker
 howto/stores
 howto/idp-initiated
 howto/authn-context
+howto/extensions
 howto/logout
 howto/release
 howto/simplesamlphp

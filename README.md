@@ -109,6 +109,14 @@ asserted one checked -- per login via `SamlEngine`, or for the whole router via
 Logging out is a `POST` to `{mount_path}/slo` with a CSRF token;
 `GET {mount_path}/slo` only renders a confirmation form (`docs/howto/logout.md`).
 
+## Extensions and raw attributes
+
+`SamlEngine.create_authn_request(extensions=[...])` adds namespaced XML to
+`<samlp:Extensions>` for one login; `SamlEngine.parse_response_details()`
+also returns every `<saml:Attribute>` with its XML attributes. The
+`fastapi_auth.saml.akdb` module builds BundID's `akdb:AuthenticationRequest`
+and reads `akdb:TrustLevel`; see `docs/howto/extensions.md`.
+
 ## Docs
 
 Full documentation (Sphinx + MyST) lives in `docs/`:
