@@ -49,6 +49,9 @@ dev = [
     "aiosqlite>=0.20",
     "redis>=5",
     "sqlmodel>=0.0.22",
+    # SQLAlchemy's asyncio layer needs greenlet; SQLAlchemy only pulls it in on some
+    # platforms (not on macOS arm64).
+    "greenlet",
 ]
 
 [project.urls]
@@ -65,6 +68,8 @@ namespaces = true
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+# Design records and plans are dated snapshots: never reformat their code samples.
+extend-exclude = ["docs/superpowers"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "UP", "I", "D", "S"]
@@ -87,4 +92,7 @@ filterwarnings = [
     # Upstream Starlette/httpx transition: FastAPI's TestClient still imports httpx (0.x);
     # Starlette nudges toward httpx2. Not our code. Revisit when the ecosystem settles.
     "ignore:Using `httpx` with `starlette.testclient` is deprecated:Warning",
+    # Upstream pysaml2 (saml2.cryptography.symmetric) still references modes.CFB at import
+    # time, which newer cryptography releases deprecate. Not our code.
+    "ignore:CFB has been moved:Warning",
 ]

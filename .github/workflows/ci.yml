@@ -11,13 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
+      # The runner's system Python is externally managed (PEP 668), so install into
+      # a venv that setup-uv creates and activates for all following steps.
       - uses: astral-sh/setup-uv@v5
-      - run: uv python install ${{ matrix.python }}
-      - run: uv pip install --system -e ".[dev]"
-      - run: ruff check .
-      - run: ruff format --check .
-      - run: ty check src tests
-      - run: pytest -m "not integration"
+        with:
+          python-version: ${{ matrix.python }}
+          activate-environment: true
+      - run: uv pip install -e ".[dev]"
+      - run: make lint
+      - run: make test-local
   integration:
     runs-on: ubuntu-latest
     services:
@@ -36,8 +38,12 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       - uses: astral-sh/setup-uv@v5
-      - run: uv pip install --system -e ".[dev,postgres]"
-      - run: pytest -m integration
+        with:
+          activate-environment: true
+      - run: uv pip install -e ".[dev,postgres]"
+      # Services come from the job definition above, so this calls pytest directly
+      # instead of `make test-integration` (which starts its own compose stack).
+      - run: uv run pytest -m integration
         env:
           IT_REDIS_URL: redis://localhost:6379/0
           IT_DB_URL: postgresql+asyncpg://postgres:pw@localhost:5432/fa
@@ -51,5 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv pip install --system -e ".[docs]"
+        with:
+          activate-environment: true
+      - run: uv pip install -e ".[docs]"
       - run: uv run sphinx-build -W -b html docs docs/_build
