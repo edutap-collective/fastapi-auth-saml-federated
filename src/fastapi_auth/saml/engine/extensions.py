@@ -20,10 +20,21 @@ from typing import Protocol, runtime_checkable
 from xml.etree.ElementTree import ParseError
 
 from saml2 import ExtensionElement, extension_element_from_string, samlp
-from saml2.saml import NAMESPACE as SAML_NAMESPACE
 
-#: Namespaces an extension element must not use (SAML 2.0 Core, section 3.2.1).
-_SAML_NAMESPACES = frozenset({samlp.NAMESPACE, SAML_NAMESPACE})
+#: Namespaces an extension element must not use (SAML 2.0 Core, section 3.2.1:
+#: "non-SAML-defined namespace"): those of the SAML 1.x and 2.0 core and
+#: metadata schemas. Namespaces of OASIS extension specifications that are
+#: designed for ``<samlp:Extensions>``, such as
+#: ``urn:oasis:names:tc:SAML:protocol:ext:req-attr``, stay allowed.
+_SAML_NAMESPACES = frozenset(
+    {
+        "urn:oasis:names:tc:SAML:1.0:assertion",
+        "urn:oasis:names:tc:SAML:1.0:protocol",
+        "urn:oasis:names:tc:SAML:2.0:assertion",
+        "urn:oasis:names:tc:SAML:2.0:metadata",
+        "urn:oasis:names:tc:SAML:2.0:protocol",
+    }
+)
 
 
 @runtime_checkable

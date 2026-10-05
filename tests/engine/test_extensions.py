@@ -66,8 +66,23 @@ def test_build_extensions_of_nothing_is_none():
         "",
         "urn:oasis:names:tc:SAML:2.0:protocol",
         "urn:oasis:names:tc:SAML:2.0:assertion",
+        "urn:oasis:names:tc:SAML:2.0:metadata",
+        "urn:oasis:names:tc:SAML:1.0:protocol",
+        "urn:oasis:names:tc:SAML:1.0:assertion",
     ],
 )
 def test_build_extensions_rejects_unqualified_or_saml_namespaced_elements(namespace):
     with pytest.raises(ValueError, match="namespace"):
         build_extensions([ExtensionElement("Hint", namespace=namespace)])
+
+
+def test_build_extensions_allows_oasis_extension_namespaces():
+    # OASIS extension specs define namespaces meant for <samlp:Extensions>.
+    element = ExtensionElement(
+        "RequestedAttribute", namespace="urn:oasis:names:tc:SAML:protocol:ext:req-attr"
+    )
+
+    extensions = build_extensions([element])
+
+    assert extensions is not None
+    assert extensions.extension_elements == [element]
