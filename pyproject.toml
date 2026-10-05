@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastapi-auth-saml-federated"
-version = "0.1.0.dev0"
+version = "0.2.0"
 description = "Federated SAML2 Service Provider for FastAPI (Shibboleth/eduGAIN/NREN AAIs)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -55,7 +55,8 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/loechel/fastapi-auth-saml-federated"
+Repository = "https://github.com/edutap-collective/fastapi-auth-saml-federated"
+Changelog = "https://github.com/edutap-collective/fastapi-auth-saml-federated/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

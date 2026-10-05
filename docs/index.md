@@ -103,6 +103,7 @@ confirmation form. Logout is a `POST` with a CSRF token -- see {doc}`howto/logou
 howto/docker
 howto/stores
 howto/idp-initiated
+howto/authn-context
 howto/logout
 howto/simplesamlphp
 howto/lmuidp
