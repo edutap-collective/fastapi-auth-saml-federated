@@ -96,4 +96,9 @@ filterwarnings = [
     # Upstream pysaml2 (saml2.cryptography.symmetric) still references modes.CFB at import
     # time, which newer cryptography releases deprecate. Not our code.
     "ignore:CFB has been moved:Warning",
+    # Upstream xmlschema (via pysaml2) calls PurePath.as_uri(), deprecated in Python 3.14.
+    "ignore:pathlib.PurePath.as_uri\\(\\) is deprecated:DeprecationWarning",
+    # Upstream pysaml2 (saml2.sigver) leaves NamedTemporaryFiles for xmlsec1 to the garbage
+    # collector; Python 3.14 reports that as ResourceWarning from the deallocator.
+    "ignore:Exception ignored while calling deallocator <function _TemporaryFileCloser:pytest.PytestUnraisableExceptionWarning",
 ]
