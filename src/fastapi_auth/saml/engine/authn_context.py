@@ -27,7 +27,7 @@ SPDX-License-Identifier: Apache-2.0 OR EUPL-1.2
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from saml2 import samlp
@@ -60,6 +60,9 @@ class RequestedAuthnContext(BaseModel):
         if any(not ref.strip() for ref in self.class_refs):
             msg = "class_refs must not contain blank entries"
             raise ValueError(msg)
+        if any(not ref.strip() for ref in self.ranking):
+            msg = "ranking must not contain blank entries"
+            raise ValueError(msg)
         if len(set(self.ranking)) != len(self.ranking):
             msg = "ranking must not contain duplicate entries"
             raise ValueError(msg)
@@ -82,6 +85,8 @@ class RequestedAuthnContext(BaseModel):
 
     def is_satisfied_by(self, class_ref: str) -> bool:
         """Return whether one asserted ``AuthnContextClassRef`` satisfies this request."""
+        if not class_ref:
+            return False
         if self.comparison == "exact":
             return class_ref in self.class_refs
         if class_ref in self.class_refs and self.comparison != "better":
@@ -111,12 +116,31 @@ class AuthnContextError(Exception):
         )
 
 
+def asserted_class_refs(assertion: Any) -> list[str]:
+    """Return the ``AuthnContextClassRef`` of every ``AuthnStatement`` in ``assertion``.
+
+    Read straight from the validated pysaml2 assertion (untyped, hence
+    ``Any``) rather than from ``session_info()["authn_info"]``: that falls
+    back to an ``AuthnContextDeclRef`` and drops statements without an
+    ``AuthnContext``. Here a statement without a class ref yields ``""``,
+    which never satisfies a request.
+    """
+    refs: list[str] = []
+    for statement in getattr(assertion, "authn_statement", None) or []:
+        context = getattr(statement, "authn_context", None)
+        class_ref = getattr(context, "authn_context_class_ref", None)
+        text = getattr(class_ref, "text", None)
+        refs.append(text.strip() if isinstance(text, str) else "")
+    return refs
+
+
 def check_authn_context(requested: RequestedAuthnContext, returned: Sequence[str]) -> None:
     """Raise :class:`AuthnContextError` unless every returned class ref satisfies ``requested``.
 
     ``returned`` holds the ``AuthnContextClassRef`` of each ``AuthnStatement``
-    in the assertion. An assertion without any class ref is rejected, and so
-    is one in which any statement falls short -- the caller cannot know which
+    in the assertion (see :func:`asserted_class_refs`; ``""`` for a statement
+    without one). An assertion without any class ref is rejected, and so is
+    one in which any statement falls short -- the caller cannot know which
     statement a consumer will rely on.
     """
     returned_list = list(returned)

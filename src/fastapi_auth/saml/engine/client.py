@@ -18,7 +18,11 @@ from saml2.client import Saml2Client
 from saml2.config import SPConfig
 from saml2.metadata import create_metadata_string
 
-from fastapi_auth.saml.engine.authn_context import RequestedAuthnContext, check_authn_context
+from fastapi_auth.saml.engine.authn_context import (
+    RequestedAuthnContext,
+    asserted_class_refs,
+    check_authn_context,
+)
 from fastapi_auth.saml.engine.config import build_sp_config
 from fastapi_auth.saml.engine.errors import SamlResponseError
 from fastapi_auth.saml.engine.logout import build_logout_redirect, parse_logout_response
@@ -57,19 +61,6 @@ def _extract_authn_instant(authn_info: list[Any]) -> datetime | None:
         except ValueError:
             return None
     return None
-
-
-def _authn_class_refs(authn_info: list[Any]) -> list[str]:
-    """Return the ``AuthnContextClassRef`` of every AuthnStatement in ``authn_info``.
-
-    Entries without a class ref (e.g. only an ``AuthnContextDeclRef``) are
-    skipped, so they can never satisfy a requested context.
-    """
-    return [
-        str(entry[0])
-        for entry in authn_info
-        if isinstance(entry, tuple) and entry and isinstance(entry[0], str) and entry[0]
-    ]
 
 
 def to_identity(resp: Any) -> FederatedIdentity:
@@ -177,8 +168,7 @@ class SamlEngine:
         if resp is None:
             raise SamlResponseError("SAML response could not be parsed")
         if requested_authn_context is not None:
-            authn_info = resp.session_info().get("authn_info") or []
-            check_authn_context(requested_authn_context, _authn_class_refs(authn_info))
+            check_authn_context(requested_authn_context, asserted_class_refs(resp.assertion))
         in_response_to = resp.in_response_to or ""  # pysaml2 untyped
         return to_identity(resp), in_response_to
 
