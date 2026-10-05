@@ -122,6 +122,11 @@ class SamlSettings(BaseSettings):
         """Path (relative to the mount root) of the embedded-discovery login endpoint."""
         return f"{self.mount_path}/login"
 
+    @property
+    def slo_path(self) -> str:
+        """Path (relative to the mount root) of the logout endpoint (POST target)."""
+        return f"{self.mount_path}/slo"
+
     def absolute_url(self, subpath: str) -> str:
         """Build an absolute SP URL for ``subpath`` under ``mount_path`` (e.g. ``/disco``)."""
         return f"{self.base_url.rstrip('/')}{self.mount_path}{subpath}"

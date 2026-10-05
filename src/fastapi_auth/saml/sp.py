@@ -18,6 +18,7 @@ from fastapi_auth.saml.factory import make_backend, make_store
 from fastapi_auth.saml.identity.identifier import select_identifier
 from fastapi_auth.saml.identity.model import FederatedIdentity
 from fastapi_auth.saml.router import build_router
+from fastapi_auth.saml.session.csrf import logout_csrf_token
 from fastapi_auth.saml.settings import SamlSettings
 
 _WAYF_TEMPLATES_DIR = Path(__file__).parent / "wayf" / "templates"
@@ -46,7 +47,8 @@ class SamlSP:
         self.store = make_store(settings)
         self.backend = make_backend(settings, self.store)
         # autoescape MUST stay on: the embedded WAYF page renders untrusted
-        # display names/entity IDs sourced from federation metadata.
+        # display names/entity IDs sourced from federation metadata, and the
+        # logout confirmation page renders the caller-supplied ``next``.
         self._jinja = Environment(
             loader=FileSystemLoader(_WAYF_TEMPLATES_DIR), autoescape=select_autoescape()
         )
@@ -72,6 +74,19 @@ class SamlSP:
             return identity
 
         return _dep
+
+    def logout_csrf_token(self, request: Request) -> str | None:
+        """Return the CSRF token a logout ``POST`` to ``/slo`` must carry, or None.
+
+        For apps that render their own logout button: put the token into a
+        hidden ``csrf_token`` field of a form that POSTs to ``{mount_path}/slo``.
+        It is bound to the current session cookie; ``None`` means there is no
+        session cookie and nothing to protect.
+        """
+        session_cookie = request.cookies.get(self.settings.session_cookie_name)
+        if not session_cookie:
+            return None
+        return logout_csrf_token(self.settings.session_secret, session_cookie)
 
     def identifier(self, identity: FederatedIdentity) -> str | None:
         """Return this SP's chosen stable identifier for the identity."""

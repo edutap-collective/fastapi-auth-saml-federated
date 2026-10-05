@@ -1,9 +1,10 @@
 """Best-effort SP-initiated Single Logout (SLO): LogoutRequest build + local invalidation."""
 
+import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.testclient import TestClient
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2.config import IdPConfig
@@ -84,6 +85,21 @@ def _login(client, sp, make_idp):
     assert sp.settings.session_cookie_name in acs.headers.get("set-cookie", "")
 
 
+def _logout_form(client, next_url: str | None = None) -> dict[str, str]:
+    """GET the logout confirmation page and return the fields of its POST form."""
+    params = {"next": next_url} if next_url is not None else {}
+    page = client.get("/saml/slo", params=params, follow_redirects=False)
+    assert page.status_code == 200
+    assert page.headers["content-type"].startswith("text/html")
+    assert re.search(r'<form method="post" action="/saml/slo">', page.text)
+    return dict(re.findall(r'<input type="hidden" name="(\w+)" value="([^"]*)"', page.text))
+
+
+def _logout(client):
+    """Log out the way a browser does: confirmation page, then POST its form."""
+    return client.post("/saml/slo", data=_logout_form(client), follow_redirects=False)
+
+
 # --- (a) create_logout_redirect() builds a signed LogoutRequest to the IdP's SLO ---
 
 
@@ -136,7 +152,7 @@ async def test_create_logout_redirect_never_raises_when_nameid_build_fails(
     assert await engine.create_logout_redirect(identity) is None
 
 
-# --- (b) GET /saml/slo ALWAYS clears the local session ---
+# --- (b) POST /saml/slo ALWAYS clears the local session ---
 
 
 def test_slo_redirects_to_idp_and_clears_session(certs, idp_metadata_file, make_idp):
@@ -146,7 +162,7 @@ def test_slo_redirects_to_idp_and_clears_session(certs, idp_metadata_file, make_
     _login(client, sp, make_idp)
     assert client.get("/me").status_code == 200
 
-    slo = client.get("/saml/slo", follow_redirects=False)
+    slo = _logout(client)
     assert slo.status_code == 303
     location = slo.headers["location"]
     assert urlparse(location).netloc == urlparse(SLO).netloc
@@ -164,7 +180,7 @@ def test_slo_clears_session_and_redirects_home_without_idp_slo(certs, tmp_path, 
     _login(client, sp, make_idp)
     assert client.get("/me").status_code == 200
 
-    slo = client.get("/saml/slo", follow_redirects=False)
+    slo = _logout(client)
     assert slo.status_code == 303
     assert slo.headers["location"] == "/"
     assert sp.settings.session_cookie_name in slo.headers.get("set-cookie", "")
@@ -189,7 +205,7 @@ def test_slo_clears_session_when_logout_redirect_build_raises(
 
     monkeypatch.setattr("fastapi_auth.saml.engine.logout.NameID", _boom)
 
-    slo = client.get("/saml/slo", follow_redirects=False)
+    slo = _logout(client)
     assert slo.status_code == 303
     assert sp.settings.session_cookie_name in slo.headers.get("set-cookie", "")
 
@@ -201,9 +217,122 @@ def test_slo_without_prior_session_still_redirects(certs, idp_metadata_file):
     app, _sp = _build_app(certs, idp_metadata_file)
     client = TestClient(app)
 
+    slo = client.post("/saml/slo", data={"next": "/app"}, follow_redirects=False)
+    assert slo.status_code == 303
+    assert slo.headers["location"] == "/app"
+
+
+def test_slo_get_without_session_redirects_without_confirmation(certs, idp_metadata_file):
+    app, _sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+
     slo = client.get("/saml/slo", params={"next": "/app"}, follow_redirects=False)
     assert slo.status_code == 303
     assert slo.headers["location"] == "/app"
+
+
+# --- (c) logout CSRF (issue #15): GET never logs out, POST needs the session's token ---
+
+
+def test_slo_get_only_renders_a_confirmation_page(certs, idp_metadata_file, make_idp):
+    """A cross-site link or redirect to GET /slo must not end the session (issue #15)."""
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    fields = _logout_form(client, next_url="/app")
+
+    assert fields["next"] == "/app"
+    assert fields["csrf_token"]
+    assert client.get("/me").status_code == 200
+
+
+def test_slo_confirmation_page_cannot_be_framed(certs, idp_metadata_file, make_idp):
+    """Clickjacking the confirmation button would be CSRF by other means."""
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    page = client.get("/saml/slo")
+
+    assert page.headers["x-frame-options"] == "DENY"
+    assert "frame-ancestors 'none'" in page.headers["content-security-policy"]
+
+
+def test_slo_confirmation_page_escapes_next(certs, idp_metadata_file, make_idp):
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    page = client.get("/saml/slo", params={"next": '/a"><script>x</script>'})
+
+    assert "<script>" not in page.text
+
+
+def test_slo_post_without_token_is_rejected(certs, idp_metadata_file, make_idp):
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    slo = client.post("/saml/slo", data={"next": "/app"}, follow_redirects=False)
+
+    assert slo.status_code == 403
+    assert sp.settings.session_cookie_name not in slo.headers.get("set-cookie", "")
+    assert client.get("/me").status_code == 200
+
+
+def test_slo_post_with_wrong_token_is_rejected(certs, idp_metadata_file, make_idp):
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    slo = client.post("/saml/slo", data={"csrf_token": "forged"}, follow_redirects=False)
+
+    assert slo.status_code == 403
+    assert client.get("/me").status_code == 200
+
+
+def test_slo_post_with_non_ascii_token_is_rejected_not_an_error(certs, idp_metadata_file, make_idp):
+    app, sp = _build_app(certs, idp_metadata_file)
+    client = TestClient(app)
+    _login(client, sp, make_idp)
+
+    slo = client.post("/saml/slo", data={"csrf_token": "ä"}, follow_redirects=False)
+
+    assert slo.status_code == 403
+
+
+def test_slo_token_is_bound_to_the_session(certs, idp_metadata_file, make_idp):
+    """A token an attacker obtained for their own session does not log out the victim."""
+    app, sp = _build_app(certs, idp_metadata_file)
+    attacker, victim = TestClient(app), TestClient(app)
+    _login(attacker, sp, make_idp)
+    _login(victim, sp, make_idp)
+    attacker_token = _logout_form(attacker)["csrf_token"]
+
+    slo = victim.post("/saml/slo", data={"csrf_token": attacker_token}, follow_redirects=False)
+
+    assert slo.status_code == 403
+    assert victim.get("/me").status_code == 200
+
+
+def test_logout_csrf_token_for_app_rendered_forms(certs, idp_metadata_file, make_idp):
+    """Apps that render their own logout button get the token from SamlSP."""
+    app, sp = _build_app(certs, idp_metadata_file)
+
+    @app.get("/token")
+    async def token(request: Request):
+        return {"token": sp.logout_csrf_token(request)}
+
+    client = TestClient(app)
+    assert client.get("/token").json() == {"token": None}
+    _login(client, sp, make_idp)
+    csrf_token = client.get("/token").json()["token"]
+
+    slo = client.post("/saml/slo", data={"csrf_token": csrf_token}, follow_redirects=False)
+
+    assert slo.status_code == 303
+    assert client.get("/me").status_code == 401
 
 
 def test_slo_return_ignores_missing_and_garbage_response(certs, idp_metadata_file):

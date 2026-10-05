@@ -91,6 +91,9 @@ and `mount_path` can never diverge -- calling `include_router()` directly with
 a hand-written `prefix=` risks mounting the router somewhere that no longer
 matches the paths `acs_url`, `absolute_url()`, and `wayf_login_path` compute.
 
+Since 0.2.0, `GET {mount_path}/slo` no longer logs out; it renders a
+confirmation form. Logout is a `POST` with a CSRF token -- see {doc}`howto/logout`.
+
 ## How-to guides
 
 ```{toctree}
@@ -100,6 +103,7 @@ matches the paths `acs_url`, `absolute_url()`, and `wayf_login_path` compute.
 howto/docker
 howto/stores
 howto/idp-initiated
+howto/logout
 howto/simplesamlphp
 howto/lmuidp
 howto/dfn-aai
