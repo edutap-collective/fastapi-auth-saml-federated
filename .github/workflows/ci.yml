@@ -13,11 +13,12 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       # The runner's system Python is externally managed (PEP 668), so install into
       # ./.venv, which `uv pip` and the `uv run` calls in the Makefile pick up.
-      # python-version also sets UV_PYTHON, overriding .python-version.
+      # python-version also sets UV_PYTHON, overriding .python-version; with it,
+      # setup-uv creates the venv itself, hence --allow-existing.
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: uv venv
+      - run: uv venv --allow-existing
       - run: uv pip install -e ".[dev]"
       - run: make lint
       - run: make test-local
@@ -39,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       - uses: astral-sh/setup-uv@v5
-      - run: uv venv
+      - run: uv venv --allow-existing
       - run: uv pip install -e ".[dev,postgres]"
       # Services come from the job definition above, so this calls pytest directly
       # instead of `make test-integration` (which starts its own compose stack).
@@ -57,6 +58,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv venv
+      - run: uv venv --allow-existing
       - run: uv pip install -e ".[docs]"
       - run: uv run sphinx-build -W -b html docs docs/_build
