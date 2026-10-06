@@ -80,6 +80,14 @@ def test_requiring_no_signature_at_all_is_refused(certs, idp_metadata_file):
         _settings(certs, idp_metadata_file, want_assertions_signed=False)
 
 
+def test_no_signature_set_after_construction_is_refused_by_the_engine(certs, idp_metadata_file):
+    """``SamlSettings`` is mutable; the engine rechecks before handing it to pysaml2."""
+    settings = _settings(certs, idp_metadata_file)
+    settings.want_assertions_signed = False
+    with pytest.raises(ValueError, match="want_assertions_signed or want_response_signed"):
+        SamlEngine(settings)
+
+
 @pytest.mark.parametrize("requirement", [ASSERTION_ONLY, RESPONSE_ONLY, BOTH])
 def test_requirement_reaches_the_pysaml2_config(certs, idp_metadata_file, requirement):
     sp = build_sp_config(_settings(certs, idp_metadata_file, **requirement))["service"]["sp"]

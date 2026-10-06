@@ -13,7 +13,8 @@ Two settings select the requirement:
 | Signed response | `False` | `True` |
 | Both signed | `True` | `True` |
 
-Setting both to `False` is refused when `SamlSettings` is created. The SP
+Setting both to `False` is refused when `SamlSettings` is created, and when
+`SamlEngine` is created from settings changed afterwards. The SP
 would otherwise accept a response in which nothing is signed, so anyone could
 post a forged login to the ACS.
 

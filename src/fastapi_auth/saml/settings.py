@@ -20,6 +20,20 @@ def _default_xmlsec() -> str:
     return shutil.which("xmlsec1") or "/usr/bin/xmlsec1"
 
 
+def check_signature_requirement(settings: SamlSettings) -> None:
+    """Raise ``ValueError`` unless an IdP signature is required on the assertion or response.
+
+    Called when ``SamlSettings`` is validated and again when the pysaml2
+    config is built, because the settings stay mutable after validation.
+    """
+    if not (settings.want_assertions_signed or settings.want_response_signed):
+        msg = (
+            "At least one of want_assertions_signed or want_response_signed must be True; "
+            "otherwise unsigned SAML responses are accepted"
+        )
+        raise ValueError(msg)
+
+
 class SamlSettings(BaseSettings):
     """Service-provider settings, populated from environment (prefix ``SAML_``)."""
 
@@ -206,12 +220,7 @@ class SamlSettings(BaseSettings):
         pysaml2 accepts a response in which nothing is signed -- anyone could
         then post a forged login to the ACS.
         """
-        if not (self.want_assertions_signed or self.want_response_signed):
-            msg = (
-                "At least one of want_assertions_signed or want_response_signed must be True; "
-                "otherwise unsigned SAML responses are accepted"
-            )
-            raise ValueError(msg)
+        check_signature_requirement(self)
         return self
 
     @model_validator(mode="after")

@@ -20,8 +20,9 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - `SamlSettings` refuses `want_assertions_signed=False` unless
-  `want_response_signed=True`. Before, that combination accepted SAML
-  responses in which nothing was signed.
+  `want_response_signed=True`, and so does `SamlEngine` for settings changed
+  after creation. Before, that combination accepted SAML responses in which
+  nothing was signed.
 
 ## [0.3.0] - 2026-10-06
 
@@ -79,5 +80,6 @@ First release on PyPI.
 
 Development version, never published.
 
+[0.3.1]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/22f5ff9...v0.2.0

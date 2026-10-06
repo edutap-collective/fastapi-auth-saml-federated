@@ -12,7 +12,7 @@ import httpx
 from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
 
 from fastapi_auth.saml.engine.entity_categories import resolve_entity_categories
-from fastapi_auth.saml.settings import SamlSettings
+from fastapi_auth.saml.settings import SamlSettings, check_signature_requirement
 
 
 def load_idp_metadata(settings: SamlSettings) -> str:
@@ -62,8 +62,11 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
     The top level always carries ``encryption_keypairs`` (so the SP can
     decrypt EncryptedAssertions) and, if configured, ``entity_category``.
     The ``metadata`` block is dispatched per ``settings.metadata_source`` by
-    :func:`build_metadata_config`.
+    :func:`build_metadata_config`. Raises ``ValueError`` if neither the
+    assertion nor the response signature is required.
     """
+    # SamlSettings is mutable: recheck here what its validator checked at creation.
+    check_signature_requirement(settings)
     slo_url = settings.absolute_url("/slo/return")
     sp: dict[str, Any] = {
         "endpoints": {
