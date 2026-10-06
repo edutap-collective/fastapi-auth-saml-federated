@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-10-06
+
+### Added
+
+- `SamlEngine.idp_sso_url(idp_entity_id=None, *, binding=HTTP-Redirect)`
+  returns the IdP's `SingleSignOnService` location from the loaded metadata,
+  for example for a Content-Security-Policy `form-action`. Raises
+  `LookupError` for an unknown IdP or a binding it does not offer.
+- `SamlSettings.want_response_signed` (`SAML_WANT_RESPONSE_SIGNED`, default
+  `False`). Together with `want_assertions_signed` it selects the required
+  IdP signature: on the assertion (default, unchanged), on the response, or
+  on both.
+
+### Changed
+
+- `SamlSettings` refuses `want_assertions_signed=False` unless
+  `want_response_signed=True`, and so does `SamlEngine` for settings changed
+  after creation. Before, that combination accepted SAML responses in which
+  nothing was signed.
+
 ## [0.3.0] - 2026-10-06
 
 ### Added
@@ -60,5 +80,6 @@ First release on PyPI.
 
 Development version, never published.
 
+[0.3.1]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/22f5ff9...v0.2.0

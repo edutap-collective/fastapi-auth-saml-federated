@@ -16,8 +16,10 @@ import anyio.to_thread
 from pydantic import BaseModel, ConfigDict
 from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT, ExtensionElement
 from saml2.client import Saml2Client
+from saml2.client_base import IdpUnspecified
 from saml2.config import SPConfig
 from saml2.metadata import create_metadata_string
+from saml2.s_utils import UnknownSystemEntity, UnsupportedBinding
 
 from fastapi_auth.saml.engine.attributes import SamlAttribute, assertion_attributes
 from fastapi_auth.saml.engine.authn_context import (
@@ -258,6 +260,36 @@ class SamlEngine:
         return await anyio.to_thread.run_sync(
             parse_logout_response, self._client, saml_response, binding
         )
+
+    def idp_sso_url(
+        self, idp_entity_id: str | None = None, *, binding: str = BINDING_HTTP_REDIRECT
+    ) -> str:
+        """Return the IdP's SingleSignOnService location for ``binding``, from loaded metadata.
+
+        ``idp_entity_id`` defaults to ``settings.fixed_idp_entity_id``, like
+        :meth:`create_authn_request`; ``binding`` defaults to HTTP-Redirect,
+        the binding :meth:`create_authn_request` uses. If the metadata lists
+        several locations for that binding, the first one is returned, as
+        for the AuthnRequest. Useful, for example, for the
+        ``form-action`` directive of a Content-Security-Policy.
+
+        Raises :class:`LookupError` if the IdP is not in the metadata or
+        publishes no SingleSignOnService for ``binding``.
+
+        Synchronous: with ``metadata_source="mdq"`` an IdP not yet cached is
+        fetched over the network, so call it at startup or via
+        ``anyio.to_thread.run_sync`` on the request path.
+        """
+        resolved_idp = idp_entity_id or self._settings.fixed_idp_entity_id
+        msg = f"No SingleSignOnService for {binding} at IdP {resolved_idp}"
+        try:
+            # The same lookup pysaml2 uses for the AuthnRequest destination.
+            location = self._client.sso_location(resolved_idp, binding)
+        except (UnknownSystemEntity, UnsupportedBinding, IdpUnspecified) as err:
+            raise LookupError(msg) from err
+        if not location:
+            raise LookupError(msg)
+        return str(location)
 
     def sp_metadata(self) -> str:
         """Return this SP's metadata XML."""
