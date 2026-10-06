@@ -105,6 +105,8 @@ howto/stores
 howto/idp-initiated
 howto/authn-context
 howto/extensions
+howto/signatures
+howto/sso-endpoint
 howto/logout
 howto/release
 howto/simplesamlphp

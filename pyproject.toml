@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastapi-auth-saml-federated"
-version = "0.3.0"
+version = "0.3.1"
 description = "Federated SAML2 Service Provider for FastAPI (Shibboleth/eduGAIN/NREN AAIs)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -101,4 +101,9 @@ filterwarnings = [
     # Upstream pysaml2 (saml2.sigver) leaves NamedTemporaryFiles for xmlsec1 to the garbage
     # collector; Python 3.14 reports that as ResourceWarning from the deallocator.
     "ignore:Exception ignored while calling deallocator <function _TemporaryFileCloser:pytest.PytestUnraisableExceptionWarning",
+    # When a signature check fails, pysaml2 (saml2.sigver.check_signature) leaves the
+    # certificate's temporary .pem file open as well. Python 3.12/3.13 report it as
+    # "Exception ignored in: ...", 3.14 as "... while finalizing file ...". ":" separates
+    # filter fields, hence "." in its place.
+    "ignore:Exception ignored (in.|while finalizing file) <_io.FileIO name='[^']*\\.pem':pytest.PytestUnraisableExceptionWarning",
 ]

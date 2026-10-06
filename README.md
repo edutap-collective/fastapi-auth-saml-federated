@@ -117,6 +117,14 @@ also returns every `<saml:Attribute>` with its XML attributes. The
 `fastapi_auth.saml.akdb` module builds BundID's `akdb:AuthenticationRequest`
 and reads `akdb:TrustLevel`; see `docs/howto/extensions.md`.
 
+## Signatures and the IdP sign-in endpoint
+
+By default the SP requires a signed assertion. `want_response_signed=True`
+(with `want_assertions_signed=False`, or `True` for both) requires a signed
+response instead; see `docs/howto/signatures.md`.
+`SamlEngine.idp_sso_url()` returns the IdP's `SingleSignOnService` location,
+for example for a CSP `form-action`; see `docs/howto/sso-endpoint.md`.
+
 ## Docs
 
 Full documentation (Sphinx + MyST) lives in `docs/`:

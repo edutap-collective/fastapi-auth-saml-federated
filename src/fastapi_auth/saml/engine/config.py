@@ -73,7 +73,7 @@ def build_sp_config(settings: SamlSettings) -> dict[str, Any]:
         "allow_unsolicited": settings.allow_idp_initiated,
         "authn_requests_signed": settings.authn_requests_signed,
         "want_assertions_signed": settings.want_assertions_signed,
-        "want_response_signed": False,
+        "want_response_signed": settings.want_response_signed,
     }
     if settings.required_attributes:
         sp["required_attributes"] = settings.required_attributes

@@ -76,7 +76,10 @@ class SamlSettings(BaseSettings):
 
     # --- crypto / security ---
     xmlsec_binary: str = Field(default_factory=_default_xmlsec)
+    # Which IdP signature the SP demands: on the assertion (default), on the
+    # response, or on both. At least one must be True (see _check_signature_requirement).
     want_assertions_signed: bool = True
+    want_response_signed: bool = False
     authn_requests_signed: bool = True
 
     # --- SP profile: identifier selection (Spec §5.1) ---
@@ -191,6 +194,22 @@ class SamlSettings(BaseSettings):
             msg = (
                 "JWT backend with an asymmetric jwt_alg requires both "
                 "jwt_private_key_file and jwt_public_key_file"
+            )
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _check_signature_requirement(self) -> SamlSettings:
+        """Refuse a configuration that would accept unsigned SAML responses.
+
+        With neither ``want_assertions_signed`` nor ``want_response_signed``,
+        pysaml2 accepts a response in which nothing is signed -- anyone could
+        then post a forged login to the ACS.
+        """
+        if not (self.want_assertions_signed or self.want_response_signed):
+            msg = (
+                "At least one of want_assertions_signed or want_response_signed must be True; "
+                "otherwise unsigned SAML responses are accepted"
             )
             raise ValueError(msg)
         return self
