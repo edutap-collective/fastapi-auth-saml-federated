@@ -94,6 +94,11 @@ matches the paths `acs_url`, `absolute_url()`, and `wayf_login_path` compute.
 Since 0.2.0, `GET {mount_path}/slo` no longer logs out; it renders a
 confirmation form. Logout is a `POST` with a CSRF token -- see {doc}`howto/logout`.
 
+Since 0.4.0, an SP that requires neither a signed assertion nor a signed
+response (`want_assertions_signed=False` and `want_response_signed=False`)
+no longer starts. Set `want_response_signed=True` for an IdP that signs only
+the response -- see {doc}`howto/signatures`.
+
 ## How-to guides
 
 ```{toctree}

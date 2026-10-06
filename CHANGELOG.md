@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.1] - 2026-10-06
+## [0.4.0] - 2026-10-06
 
 ### Added
 
@@ -19,10 +19,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- `SamlSettings` refuses `want_assertions_signed=False` unless
-  `want_response_signed=True`, and so does `SamlEngine` for settings changed
-  after creation. Before, that combination accepted SAML responses in which
-  nothing was signed.
+- **Breaking:** an application configured with `want_assertions_signed=False`
+  and `want_response_signed=False` no longer starts. `SamlSettings` refuses
+  that combination with a `ValidationError`, and `SamlEngine` refuses it with
+  a `ValueError` if the settings were changed after creation. Before, it
+  accepted SAML responses in which nothing was signed. To keep an IdP that
+  signs only the response, set `want_response_signed=True`.
 
 ## [0.3.0] - 2026-10-06
 
@@ -80,6 +82,6 @@ First release on PyPI.
 
 Development version, never published.
 
-[0.3.1]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.3.0...v0.3.1
+[0.4.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/edutap-collective/fastapi-auth-saml-federated/compare/22f5ff9...v0.2.0
