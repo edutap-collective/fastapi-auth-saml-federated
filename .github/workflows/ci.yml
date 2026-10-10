@@ -15,7 +15,7 @@ jobs:
       # ./.venv, which `uv pip` and the `uv run` calls in the Makefile pick up.
       # python-version also sets UV_PYTHON, overriding .python-version; with it,
       # setup-uv creates the venv itself, hence --allow-existing.
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: ${{ matrix.python }}
       - run: uv venv --allow-existing
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v10.3.0
       - run: uv venv --allow-existing
       - run: uv pip install -e ".[dev,postgres]"
       # Services come from the job definition above, so this calls pytest directly
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v10.3.0
       - run: uv venv --allow-existing
       - run: uv pip install -e ".[docs]"
       - run: uv run sphinx-build -W -b html docs docs/_build
