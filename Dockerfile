@@ -3,7 +3,7 @@ FROM python:3.13-slim AS build
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 # uv for fast, reproducible installs
-COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13 /uv /usr/local/bin/uv
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN uv pip install --system --no-cache ".[redis,postgres]"
