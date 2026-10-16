@@ -9,7 +9,7 @@ jobs:
       matrix:
         python: ["3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       # The runner's system Python is externally managed (PEP 668), so install into
       # ./.venv, which `uv pip` and the `uv run` calls in the Makefile pick up.
@@ -37,7 +37,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xmlsec1
       - uses: astral-sh/setup-uv@v5
       - run: uv venv --allow-existing
@@ -51,12 +51,12 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t fa-saml:ci .
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v5
       - run: uv venv --allow-existing
       - run: uv pip install -e ".[docs]"
